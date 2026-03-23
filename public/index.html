@@ -3,70 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallet Battle Arena | Who's the Better Onchain Player?</title>
+<title>Wallet Battle Arena | Nansen CLI Hackathon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
+  :root {
+    --neon: #00e676;
+    --neon-dim: rgba(0,230,118,0.15);
+    --neon-glow: rgba(0,230,118,0.4);
+    --neon-bright: #69f0ae;
+    --bg: #050a08;
+    --bg-card: rgba(8,18,12,0.9);
+    --bg-input: rgba(5,12,8,0.8);
+    --border: rgba(0,230,118,0.08);
+    --border-hover: rgba(0,230,118,0.25);
+    --text: #d0e8d8;
+    --text-dim: rgba(160,200,170,0.5);
+    --text-muted: rgba(120,160,130,0.35);
+    --red: #ff4444;
+    --blue: #4488ff;
+    --gold: #ffd700;
+  }
+
   @keyframes glowPulse {
-    0%, 100% { text-shadow: 0 0 20px rgba(255,100,50,0.6), 0 0 40px rgba(255,60,20,0.3), 0 0 80px rgba(255,40,0,0.15); }
-    50% { text-shadow: 0 0 30px rgba(255,120,60,0.8), 0 0 60px rgba(255,80,30,0.5), 0 0 100px rgba(255,50,10,0.25); }
+    0%, 100% { text-shadow: 0 0 20px var(--neon-glow), 0 0 60px rgba(0,230,118,0.15); }
+    50% { text-shadow: 0 0 30px var(--neon-glow), 0 0 80px rgba(0,230,118,0.25); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes subtleFloat {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    50% { transform: translateY(-5px); }
   }
 
   @keyframes buttonPulse {
-    0%, 100% { box-shadow: 0 0 20px rgba(255,80,30,0.4), 0 0 40px rgba(255,50,10,0.2), inset 0 0 20px rgba(255,255,255,0.05); }
-    50% { box-shadow: 0 0 30px rgba(255,100,40,0.6), 0 0 60px rgba(255,60,20,0.35), inset 0 0 30px rgba(255,255,255,0.08); }
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    0%, 100% { box-shadow: 0 0 20px rgba(0,230,118,0.25), 0 0 50px rgba(0,230,118,0.1); }
+    50% { box-shadow: 0 0 30px rgba(0,230,118,0.4), 0 0 70px rgba(0,230,118,0.2); }
   }
 
   @keyframes scanline {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100%; }
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
   }
 
-  @keyframes borderGlow {
-    0%, 100% { border-color: rgba(255,255,255,0.06); }
-    50% { border-color: rgba(255,255,255,0.12); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes terminalBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
 
   @keyframes vsFlicker {
     0%, 90%, 100% { opacity: 1; }
-    92% { opacity: 0.8; }
-    94% { opacity: 1; }
-    96% { opacity: 0.6; }
-    98% { opacity: 1; }
+    92% { opacity: 0.7; }
+    96% { opacity: 0.5; }
   }
 
   body {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0a0a1a;
-    color: #e0e0e8;
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
   }
 
-  /* Subtle grid background */
+  /* Subtle matrix-style grid */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     background:
-      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(0,230,118,0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,230,118,0.012) 1px, transparent 1px);
+    background-size: 50px 50px;
     pointer-events: none;
     z-index: 0;
   }
@@ -75,812 +91,821 @@
   body::after {
     content: '';
     position: fixed;
-    top: -200px;
+    top: -300px;
     left: 50%;
     transform: translateX(-50%);
-    width: 800px;
-    height: 500px;
-    background: radial-gradient(ellipse, rgba(255,60,20,0.07) 0%, rgba(100,40,200,0.04) 40%, transparent 70%);
+    width: 900px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(0,230,118,0.06) 0%, rgba(0,180,90,0.03) 40%, transparent 70%);
     pointer-events: none;
     z-index: 0;
+  }
+
+  /* Scanline overlay */
+  .scanline-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,230,118,0.008) 2px,
+      rgba(0,230,118,0.008) 4px
+    );
   }
 
   .container {
     position: relative;
     z-index: 1;
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     padding: 40px 20px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 
   /* ── Header ── */
   .header {
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 40px;
     animation: fadeInUp 0.8s ease-out;
   }
 
-  .logo-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-    display: block;
-    filter: drop-shadow(0 0 20px rgba(255,80,30,0.5));
-    animation: subtleFloat 4s ease-in-out infinite;
+  .nansen-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: var(--neon-dim);
+    border: 1px solid rgba(0,230,118,0.2);
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 20px;
+  }
+
+  .nansen-badge .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--neon);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--neon-glow);
+    animation: terminalBlink 2s infinite;
   }
 
   .title {
-    font-size: clamp(2rem, 6vw, 3.2rem);
-    font-weight: 900;
-    letter-spacing: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1.8rem, 5.5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #ff6030, #ff3c14, #ff8040, #ffaa60);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--neon);
     animation: glowPulse 3s ease-in-out infinite;
-    line-height: 1.15;
-    margin-bottom: 14px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .title .cursor {
+    display: inline-block;
+    width: 3px;
+    height: 0.85em;
+    background: var(--neon);
+    margin-left: 4px;
+    vertical-align: middle;
+    animation: terminalBlink 1s step-end infinite;
   }
 
   .subtitle {
-    font-size: clamp(0.85rem, 2.5vw, 1.05rem);
-    color: rgba(200,200,220,0.6);
-    font-weight: 400;
-    letter-spacing: 1.5px;
-    line-height: 1.5;
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
   }
 
   .subtitle strong {
-    color: rgba(220,220,240,0.85);
+    color: var(--neon-bright);
     font-weight: 600;
+  }
+
+  /* ── Data Sources ── */
+  .data-sources {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .data-tag {
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: rgba(0,230,118,0.6);
+    background: rgba(0,230,118,0.04);
+    border: 1px solid rgba(0,230,118,0.1);
+    border-radius: 4px;
   }
 
   /* ── Battle Form ── */
   .battle-form {
     width: 100%;
-    background: linear-gradient(170deg, rgba(18,18,40,0.85), rgba(12,12,28,0.95));
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 20px;
-    padding: 36px 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
     backdrop-filter: blur(20px);
-    animation: fadeInUp 0.8s ease-out 0.15s both, borderGlow 4s ease-in-out infinite;
+    animation: fadeInUp 0.8s ease-out 0.15s both;
     position: relative;
-    overflow: hidden;
   }
 
-  /* Subtle diagonal scanline overlay */
-  .battle-form::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      180deg,
-      transparent,
-      transparent 3px,
-      rgba(255,255,255,0.008) 3px,
-      rgba(255,255,255,0.008) 4px
-    );
-    pointer-events: none;
-    border-radius: 20px;
+  .form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .form-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--neon);
+  }
+
+  .form-tier {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(0,230,118,0.05);
+    border: 1px solid rgba(0,230,118,0.12);
+    border-radius: 8px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--neon-bright);
+    letter-spacing: 1px;
   }
 
   .combatants {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    position: relative;
+    gap: 16px;
   }
 
-  /* VS divider */
   .vs-divider {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    margin: 4px 0;
+    gap: 14px;
+    margin: 2px 0;
   }
 
-  .vs-line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  }
+  .vs-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
 
   .vs-text {
-    font-size: 1.3rem;
-    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
     letter-spacing: 4px;
-    background: linear-gradient(135deg, #ff4444, #aa44ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--neon);
     animation: vsFlicker 5s infinite;
   }
 
-  /* Wallet input group */
-  .wallet-group {
-    position: relative;
-  }
+  .wallet-group { position: relative; }
 
   .wallet-label {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
-    font-size: 0.75rem;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
   }
 
-  .wallet-label.challenger-a { color: #ff4444; }
-  .wallet-label.challenger-b { color: #4488ff; }
+  .wallet-label.challenger-a { color: var(--red); }
+  .wallet-label.challenger-b { color: var(--blue); }
 
-  .label-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-    flex-shrink: 0;
-  }
+  .label-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .challenger-a .label-dot { background: var(--red); box-shadow: 0 0 6px rgba(255,68,68,0.4); }
+  .challenger-b .label-dot { background: var(--blue); box-shadow: 0 0 6px rgba(68,136,255,0.4); }
 
-  .challenger-a .label-dot { background: #ff4444; box-shadow: 0 0 8px rgba(255,68,68,0.5); }
-  .challenger-b .label-dot { background: #4488ff; box-shadow: 0 0 8px rgba(68,136,255,0.5); }
-
-  .input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
+  .input-wrapper { position: relative; display: flex; align-items: center; }
 
   .address-icon {
     position: absolute;
-    left: 14px;
-    width: 24px;
-    height: 24px;
+    left: 12px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,255,255,0.08);
-    transition: all 0.3s ease;
+    background: rgba(0,230,118,0.05);
+    border: 2px solid var(--border);
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    transition: border-color 0.3s;
   }
 
-  .address-icon .icon-inner {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    transition: background 0.3s ease;
-  }
+  .address-icon .icon-inner { width: 100%; height: 100%; border-radius: 50%; }
 
   .wallet-input {
     width: 100%;
-    padding: 14px 16px 14px 50px;
-    background: rgba(10,10,30,0.7);
-    border: 1.5px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    color: #e0e0e8;
-    font-size: 0.9rem;
-    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    padding: 13px 14px 13px 48px;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--neon-bright);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
     letter-spacing: 0.3px;
     outline: none;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
   }
 
   .wallet-input::placeholder {
-    color: rgba(160,160,180,0.35);
-    font-family: 'Segoe UI', -apple-system, sans-serif;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
     letter-spacing: 0;
   }
 
   .wallet-input:focus {
-    border-color: rgba(255,255,255,0.2);
-    box-shadow: 0 0 20px rgba(100,100,255,0.08), 0 0 40px rgba(100,100,255,0.04);
-    background: rgba(12,12,35,0.9);
+    border-color: var(--border-hover);
+    box-shadow: 0 0 20px rgba(0,230,118,0.06);
   }
 
-  .wallet-group.challenger-a .wallet-input:focus {
-    border-color: rgba(255,68,68,0.4);
-    box-shadow: 0 0 20px rgba(255,68,68,0.1), 0 0 40px rgba(255,68,68,0.05);
-  }
+  .wallet-group.challenger-a .wallet-input:focus { border-color: rgba(255,68,68,0.3); box-shadow: 0 0 15px rgba(255,68,68,0.06); }
+  .wallet-group.challenger-b .wallet-input:focus { border-color: rgba(68,136,255,0.3); box-shadow: 0 0 15px rgba(68,136,255,0.06); }
 
-  .wallet-group.challenger-b .wallet-input:focus {
-    border-color: rgba(68,136,255,0.4);
-    box-shadow: 0 0 20px rgba(68,136,255,0.1), 0 0 40px rgba(68,136,255,0.05);
-  }
+  .wallet-input.valid { border-color: rgba(0,230,118,0.35); }
+  .wallet-input.invalid { border-color: rgba(255,60,60,0.35); }
 
-  /* Validation states */
-  .wallet-input.valid {
-    border-color: rgba(50,205,100,0.4);
-    box-shadow: 0 0 12px rgba(50,205,100,0.1);
-  }
-
-  .wallet-input.invalid {
-    border-color: rgba(255,60,60,0.4);
-    box-shadow: 0 0 12px rgba(255,60,60,0.1);
-  }
-
-  .wallet-input.valid + .validation-indicator,
-  .wallet-input.invalid + .validation-indicator {
-    opacity: 1;
-  }
-
-  .validation-indicator {
-    position: absolute;
-    right: 14px;
-    font-size: 14px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 2;
-  }
-
-  .wallet-input.valid ~ .validation-indicator { color: #32cd64; }
+  .validation-indicator { position: absolute; right: 14px; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 2; }
+  .wallet-input.valid ~ .validation-indicator { opacity: 1; color: var(--neon); }
   .wallet-input.valid ~ .validation-indicator::after { content: '\2713'; }
-  .wallet-input.invalid ~ .validation-indicator { color: #ff3c3c; }
+  .wallet-input.invalid ~ .validation-indicator { opacity: 1; color: var(--red); }
   .wallet-input.invalid ~ .validation-indicator::after { content: '\2717'; }
 
-  /* Chain selector */
-  .chain-row {
-    margin-top: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .chain-row { margin-top: 20px; display: flex; align-items: center; gap: 10px; }
 
   .chain-label {
-    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
     font-weight: 700;
-    letter-spacing: 2.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(180,180,200,0.5);
+    color: var(--text-muted);
     white-space: nowrap;
   }
 
   .chain-select {
     flex: 1;
-    padding: 12px 16px;
-    background: rgba(10,10,30,0.7);
-    border: 1.5px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    color: #e0e0e8;
-    font-size: 0.85rem;
-    font-weight: 500;
+    padding: 11px 40px 11px 14px;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
     outline: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
     appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300e676' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
+    background-position: right 14px center;
   }
 
-  .chain-select:focus {
-    border-color: rgba(255,255,255,0.2);
-    box-shadow: 0 0 20px rgba(100,100,255,0.08);
-  }
+  .chain-select:focus { border-color: var(--border-hover); }
+  .chain-select option { background: #0a1a10; color: var(--text); }
 
-  .chain-select option {
-    background: #12122a;
-    color: #e0e0e8;
-  }
-
-  /* Error message */
   .error-msg {
-    margin-top: 16px;
-    padding: 12px 16px;
-    background: rgba(255,40,40,0.08);
-    border: 1px solid rgba(255,40,40,0.2);
-    border-radius: 10px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: rgba(255,40,40,0.06);
+    border: 1px solid rgba(255,40,40,0.15);
+    border-radius: 8px;
     color: #ff6666;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     display: none;
-    animation: fadeInUp 0.3s ease-out;
   }
-
   .error-msg.visible { display: block; }
 
   /* ── Battle Button ── */
   .battle-btn {
     width: 100%;
-    margin-top: 28px;
-    padding: 18px 32px;
-    font-size: 1.2rem;
-    font-weight: 900;
+    margin-top: 24px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
     letter-spacing: 6px;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--bg);
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
+    background: linear-gradient(135deg, #00e676, #00c853, #00e676);
+    animation: buttonPulse 2.5s ease-in-out infinite;
+    transition: all 0.3s;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #ff4020, #ff6030, #ff3818);
-    animation: buttonPulse 2.5s ease-in-out infinite;
-    transition: all 0.3s ease;
   }
 
   .battle-btn::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.12) 50%, transparent 70%);
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
     transform: translateX(-100%);
-    transition: transform 0.6s ease;
+    transition: transform 0.5s;
   }
 
-  .battle-btn:hover:not(:disabled)::before {
-    transform: translateX(100%);
-  }
-
-  .battle-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 0 40px rgba(255,80,30,0.5), 0 0 80px rgba(255,50,10,0.3);
-  }
-
-  .battle-btn:active:not(:disabled) {
-    transform: translateY(0);
-  }
+  .battle-btn:hover:not(:disabled)::before { transform: translateX(100%); }
+  .battle-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,230,118,0.4); }
+  .battle-btn:active:not(:disabled) { transform: translateY(0); }
 
   .battle-btn:disabled {
-    background: linear-gradient(135deg, #2a2a3a, #1e1e2e);
-    color: rgba(255,255,255,0.2);
+    background: rgba(0,230,118,0.08);
+    color: rgba(0,230,118,0.2);
     cursor: not-allowed;
     animation: none;
     box-shadow: none;
   }
 
-  .battle-btn.loading {
-    pointer-events: none;
-    background: linear-gradient(135deg, #ff4020, #ff6030);
-  }
-
+  .battle-btn.loading { pointer-events: none; }
   .battle-btn .btn-text { position: relative; z-index: 1; }
-
-  .battle-btn .spinner {
-    display: none;
-    width: 22px;
-    height: 22px;
-    border: 3px solid rgba(255,255,255,0.2);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto;
-  }
-
+  .battle-btn .spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(0,0,0,0.15); border-top-color: var(--bg); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
   .battle-btn.loading .btn-text { display: none; }
   .battle-btn.loading .spinner { display: block; }
 
-  /* ── Recent Battles ── */
-  .recent-section {
-    width: 100%;
-    margin-top: 56px;
+  /* ── Tier Badge ── */
+  .tier-info {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .tier-info .free { color: var(--neon); font-weight: 600; }
+  .tier-info .paid { color: var(--gold); font-weight: 600; }
+
+  /* ══ HOW IT WORKS ══ */
+  .how-section {
+    margin-top: 48px;
     animation: fadeInUp 0.8s ease-out 0.3s both;
   }
 
-  .section-title {
-    font-size: 0.75rem;
+  .section-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: rgba(180,180,200,0.4);
+    color: var(--text-muted);
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
-  .section-title::before,
-  .section-title::after {
-    content: '\2500\2500\2500  ';
-    color: rgba(180,180,200,0.15);
-  }
-  .section-title::after {
-    content: '  \2500\2500\2500';
-  }
+  .section-header::before, .section-header::after { content: ' // '; color: rgba(0,230,118,0.15); }
 
-  .recent-list {
-    display: flex;
-    flex-direction: column;
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
   }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .stat-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+
+  .stat-icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+
+  .stat-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .stat-source {
+    font-size: 0.66rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .stat-card:nth-child(1) .stat-name { color: var(--red); }
+  .stat-card:nth-child(2) .stat-name { color: var(--blue); }
+  .stat-card:nth-child(3) .stat-name { color: #aa44ff; }
+  .stat-card:nth-child(4) .stat-name { color: var(--gold); }
+  .stat-card:nth-child(5) .stat-name { color: #44ff88; }
+  .stat-card:nth-child(6) .stat-name { color: #44ffff; }
+
+  .how-desc {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ══ PRICING ══ */
+  .pricing-section {
+    margin-top: 40px;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+  }
+
+  .pricing-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .price-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+  }
+
+  .price-card.premium {
+    border-color: rgba(255,215,0,0.2);
+    background: linear-gradient(170deg, rgba(20,15,5,0.9), var(--bg-card));
+  }
+
+  .price-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .price-card:first-child .price-label { color: var(--neon); }
+  .price-card.premium .price-label { color: var(--gold); }
+
+  .price-amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .price-card:first-child .price-amount { color: var(--neon); }
+  .price-card.premium .price-amount { color: var(--gold); }
+
+  .price-unit {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .price-detail {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .price-detail strong { color: var(--text-dim); }
+
+  .payment-methods {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .method-tag {
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 4px;
+  }
+
+  .method-tag.wallet { color: var(--gold); background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.12); }
+  .method-tag.x402 { color: #44ffff; background: rgba(68,255,255,0.06); border: 1px solid rgba(68,255,255,0.12); }
+
+  /* ══ MCP / AGENTS ══ */
+  .agents-section {
+    margin-top: 40px;
+    animation: fadeInUp 0.8s ease-out 0.5s both;
+  }
+
+  .agents-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(68,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px 20px;
+  }
+
+  .agents-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .agents-icon { font-size: 1.3rem; }
+
+  .agents-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #44ffff;
+  }
+
+  .agents-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .code-block {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(68,255,255,0.08);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: rgba(68,255,255,0.7);
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+
+  .code-block .comment { color: var(--text-muted); }
+  .code-block .key { color: var(--neon); }
+  .code-block .str { color: var(--gold); }
+
+  /* ══ RECENT BATTLES ══ */
+  .recent-section {
+    width: 100%;
+    margin-top: 40px;
+    animation: fadeInUp 0.8s ease-out 0.35s both;
+  }
+
+  .recent-list { display: flex; flex-direction: column; gap: 8px; }
 
   .recent-card {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    background: rgba(18,18,40,0.6);
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 12px;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.25s;
     text-decoration: none;
     color: inherit;
   }
 
-  .recent-card:hover {
-    background: rgba(25,25,55,0.8);
-    border-color: rgba(255,255,255,0.1);
-    transform: translateX(4px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
+  .recent-card:hover { border-color: var(--border-hover); transform: translateX(4px); }
 
-  .recent-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+  .recent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
   .recent-addresses {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-    font-size: 0.78rem;
-    color: rgba(200,200,220,0.7);
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
     min-width: 0;
   }
 
-  .recent-addr {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 140px;
-  }
-
-  .recent-addr.addr-a { color: rgba(255,100,100,0.8); }
-  .recent-addr.addr-b { color: rgba(100,160,255,0.8); }
+  .recent-addr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px; }
+  .recent-addr.addr-a { color: rgba(255,100,100,0.7); }
+  .recent-addr.addr-b { color: rgba(100,160,255,0.7); }
 
   .recent-vs {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 800;
     letter-spacing: 2px;
-    color: rgba(180,180,200,0.3);
+    color: var(--text-muted);
     flex-shrink: 0;
   }
 
   .winner-badge {
-    font-size: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     text-transform: uppercase;
     padding: 3px 8px;
-    border-radius: 6px;
+    border-radius: 4px;
     flex-shrink: 0;
-    white-space: nowrap;
   }
 
-  .winner-badge.winner-a {
-    background: rgba(255,68,68,0.15);
-    color: #ff6666;
-    border: 1px solid rgba(255,68,68,0.2);
-  }
+  .winner-badge.winner-a { background: rgba(255,68,68,0.1); color: #ff6666; border: 1px solid rgba(255,68,68,0.15); }
+  .winner-badge.winner-b { background: rgba(68,136,255,0.1); color: #6699ff; border: 1px solid rgba(68,136,255,0.15); }
+  .winner-badge.draw { background: rgba(180,180,200,0.06); color: rgba(180,180,200,0.5); border: 1px solid rgba(180,180,200,0.1); }
 
-  .winner-badge.winner-b {
-    background: rgba(68,136,255,0.15);
-    color: #6699ff;
-    border: 1px solid rgba(68,136,255,0.2);
-  }
+  .recent-arrow { color: rgba(0,230,118,0.15); font-size: 0.8rem; flex-shrink: 0; transition: color 0.25s; }
+  .recent-card:hover .recent-arrow { color: var(--neon-glow); }
 
-  .winner-badge.draw {
-    background: rgba(180,180,200,0.1);
-    color: rgba(180,180,200,0.6);
-    border: 1px solid rgba(180,180,200,0.15);
-  }
+  .empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
+  .empty-state .empty-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; opacity: 0.5; }
 
-  .recent-arrow {
-    color: rgba(255,255,255,0.15);
-    font-size: 0.85rem;
-    flex-shrink: 0;
-    transition: color 0.25s, transform 0.25s;
-  }
-
-  .recent-card:hover .recent-arrow {
-    color: rgba(255,255,255,0.4);
-    transform: translateX(2px);
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 32px 20px;
-    color: rgba(160,160,180,0.35);
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
-
-  .empty-state .empty-icon {
-    font-size: 2rem;
-    display: block;
-    margin-bottom: 8px;
-    filter: grayscale(0.5);
-    opacity: 0.5;
-  }
-
-  /* ── Free badge ── */
-  .free-badge {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 4px 14px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(68,255,136,0.8);
-    background: rgba(68,255,136,0.06);
-    border: 1px solid rgba(68,255,136,0.15);
-    border-radius: 8px;
-  }
-
-  /* ── Paywall Modal ── */
+  /* ══ PAYWALL MODAL ══ */
   .paywall-overlay {
     display: none;
     position: fixed;
     inset: 0;
     z-index: 900;
-    background: rgba(5,5,15,0.85);
+    background: rgba(3,6,4,0.88);
     backdrop-filter: blur(8px);
     align-items: center;
     justify-content: center;
-    animation: fadeInUp 0.3s ease-out;
   }
   .paywall-overlay.visible { display: flex; }
 
   .paywall-card {
-    background: linear-gradient(170deg, rgba(20,20,50,0.95), rgba(12,12,30,0.98));
-    border: 1px solid rgba(255,200,0,0.15);
-    border-radius: 20px;
-    padding: 36px 32px;
-    max-width: 440px;
+    background: linear-gradient(170deg, rgba(10,20,12,0.97), rgba(5,10,6,0.99));
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 16px;
+    padding: 32px 28px;
+    max-width: 420px;
     width: 90%;
     text-align: center;
     position: relative;
   }
 
-  .paywall-close {
-    position: absolute;
-    top: 14px;
-    right: 18px;
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.3);
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  .paywall-close:hover { color: rgba(255,255,255,0.7); }
+  .paywall-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+  .paywall-close:hover { color: var(--text); }
 
-  .paywall-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .paywall-icon { font-size: 2.2rem; margin-bottom: 10px; }
 
   .paywall-title {
-    font-size: 1.3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
     font-weight: 800;
-    letter-spacing: 2px;
-    background: linear-gradient(135deg, #ffd700, #ffaa00);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    letter-spacing: 3px;
+    color: var(--gold);
     margin-bottom: 8px;
   }
 
-  .paywall-desc {
-    font-size: 0.88rem;
-    color: rgba(200,200,220,0.6);
-    line-height: 1.5;
-    margin-bottom: 20px;
-  }
+  .paywall-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 18px; }
 
-  .paywall-price {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 6px;
-    margin-bottom: 24px;
-  }
-
-  .paywall-amount {
-    font-size: 2rem;
-    font-weight: 900;
-    color: #fff;
-  }
-
-  .paywall-currency {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: rgba(200,200,220,0.5);
-    letter-spacing: 1px;
-  }
-
-  .paywall-chain {
-    font-size: 0.7rem;
-    color: rgba(100,160,255,0.6);
-    letter-spacing: 1px;
-    display: block;
-    margin-top: -16px;
-    margin-bottom: 20px;
-  }
+  .paywall-price { display: inline-flex; align-items: baseline; gap: 6px; margin-bottom: 20px; }
+  .paywall-amount { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 800; color: var(--gold); }
+  .paywall-currency { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; }
+  .paywall-chain { font-size: 0.68rem; color: rgba(68,136,255,0.5); letter-spacing: 1px; display: block; margin-top: -12px; margin-bottom: 18px; }
 
   .pay-btn {
     width: 100%;
-    padding: 16px 24px;
-    font-size: 1rem;
+    padding: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
     font-weight: 800;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #0a0a1a;
+    color: var(--bg);
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
-    background: linear-gradient(135deg, #ffd700, #ffaa00, #ff8800);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(135deg, var(--gold), #ffaa00);
+    transition: all 0.3s;
   }
 
-  .pay-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(255,200,0,0.3), 0 0 60px rgba(255,150,0,0.15);
-  }
-
-  .pay-btn:disabled {
-    background: linear-gradient(135deg, #3a3a4a, #2a2a3a);
-    color: rgba(255,255,255,0.25);
-    cursor: not-allowed;
-  }
-
-  .pay-btn .pay-spinner {
-    display: none;
-    width: 18px;
-    height: 18px;
-    border: 3px solid rgba(0,0,0,0.15);
-    border-top-color: #0a0a1a;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto;
-  }
+  .pay-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 25px rgba(255,200,0,0.25); }
+  .pay-btn:disabled { background: rgba(255,215,0,0.1); color: rgba(255,215,0,0.2); cursor: not-allowed; }
+  .pay-btn .pay-spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(0,0,0,0.15); border-top-color: var(--bg); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
   .pay-btn.loading .pay-text { display: none; }
   .pay-btn.loading .pay-spinner { display: block; }
 
-  .paywall-status {
-    margin-top: 14px;
-    font-size: 0.8rem;
-    color: rgba(200,200,220,0.5);
-    min-height: 1.2em;
-  }
-
-  .paywall-or {
-    font-size: 0.75rem;
-    color: rgba(180,180,200,0.3);
-    margin-top: 16px;
-    letter-spacing: 1px;
-  }
-
-  .paywall-wait {
-    font-size: 0.78rem;
-    color: rgba(180,180,200,0.4);
-    margin-top: 6px;
-  }
+  .paywall-status { margin-top: 12px; font-size: 0.78rem; color: var(--text-dim); min-height: 1.2em; }
 
   .no-wallet-hint {
-    margin-top: 16px;
-    padding: 10px 14px;
-    background: rgba(255,100,50,0.06);
-    border: 1px solid rgba(255,100,50,0.12);
-    border-radius: 10px;
-    font-size: 0.78rem;
-    color: rgba(255,150,100,0.6);
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: rgba(255,100,50,0.04);
+    border: 1px solid rgba(255,100,50,0.1);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: rgba(255,150,100,0.5);
     display: none;
   }
+  .no-wallet-hint a { color: var(--gold); }
+
+  .paywall-or { font-size: 0.7rem; color: var(--text-muted); margin-top: 14px; letter-spacing: 2px; }
+  .paywall-wait { font-size: 0.75rem; color: var(--text-dim); margin-top: 6px; }
 
   /* ── Footer ── */
   .footer {
-    margin-top: 60px;
+    margin-top: 48px;
     text-align: center;
-    font-size: 0.72rem;
-    color: rgba(120,120,150,0.35);
+    font-size: 0.68rem;
+    color: var(--text-muted);
     letter-spacing: 1px;
-    animation: fadeInUp 0.8s ease-out 0.45s both;
+    animation: fadeInUp 0.8s ease-out 0.6s both;
     line-height: 1.8;
   }
-
-  .footer a {
-    color: rgba(160,160,200,0.45);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .footer a:hover {
-    color: rgba(200,200,240,0.7);
-  }
+  .footer a { color: var(--neon); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+  .footer a:hover { opacity: 0.8; }
 
   /* ── Responsive ── */
   @media (max-width: 540px) {
-    .container { padding: 28px 14px 40px; }
-    .battle-form { padding: 24px 18px; }
-    .wallet-input { font-size: 0.78rem; padding-left: 44px; }
-    .recent-addr { max-width: 90px; }
+    .container { padding: 24px 14px 40px; }
+    .battle-form { padding: 22px 16px; }
+    .wallet-input { font-size: 0.75rem; padding-left: 42px; }
+    .how-grid { grid-template-columns: repeat(2, 1fr); }
+    .pricing-cards { grid-template-columns: 1fr; }
+    .recent-addr { max-width: 85px; }
     .chain-row { flex-direction: column; align-items: stretch; gap: 6px; }
-    .title { letter-spacing: 3px; }
+    .form-header { flex-direction: column; gap: 8px; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
 
+<div class="scanline-overlay"></div>
+
 <div class="container">
 
   <!-- Header -->
   <header class="header">
-    <span class="logo-icon" aria-hidden="true">&#x2694;&#xFE0F;</span>
-    <h1 class="title">Wallet Battle<br>Arena</h1>
-    <p class="subtitle">Who's the better onchain player?<br>Powered by <strong>Nansen CLI</strong></p>
+    <div class="nansen-badge"><span class="dot"></span> Powered by Nansen CLI</div>
+    <h1 class="title">Wallet Battle<br>Arena<span class="cursor"></span></h1>
+    <p class="subtitle">Compare two wallets using <strong>real onchain data</strong> from Nansen.<br>RPG-style stats, levels, titles, and a winner.</p>
+    <div class="data-sources">
+      <span class="data-tag">balance</span>
+      <span class="data-tag">pnl-summary</span>
+      <span class="data-tag">transactions</span>
+      <span class="data-tag">counterparties</span>
+      <span class="data-tag">labels</span>
+      <span class="data-tag">tokens</span>
+    </div>
   </header>
 
   <!-- Battle Form -->
   <form class="battle-form" id="battleForm" autocomplete="off">
+    <div class="form-header">
+      <span class="form-title">> new_battle</span>
+      <span class="form-tier">1 FREE / DAY</span>
+    </div>
 
     <div class="combatants">
-
-      <!-- Challenger A -->
       <div class="wallet-group challenger-a">
-        <label class="wallet-label challenger-a" for="walletA">
-          <span class="label-dot"></span>
-          Challenger A
-        </label>
+        <label class="wallet-label challenger-a" for="walletA"><span class="label-dot"></span> Challenger A</label>
         <div class="input-wrapper">
           <div class="address-icon" id="iconA"><div class="icon-inner"></div></div>
-          <input
-            type="text"
-            id="walletA"
-            class="wallet-input"
-            placeholder="Enter wallet address (0x...)"
-            spellcheck="false"
-            autocomplete="off"
-            maxlength="42"
-          >
+          <input type="text" id="walletA" class="wallet-input" placeholder="0x..." spellcheck="false" autocomplete="off" maxlength="42">
           <span class="validation-indicator"></span>
         </div>
       </div>
 
-      <!-- VS -->
       <div class="vs-divider">
         <span class="vs-line"></span>
         <span class="vs-text">VS</span>
         <span class="vs-line"></span>
       </div>
 
-      <!-- Challenger B -->
       <div class="wallet-group challenger-b">
-        <label class="wallet-label challenger-b" for="walletB">
-          <span class="label-dot"></span>
-          Challenger B
-        </label>
+        <label class="wallet-label challenger-b" for="walletB"><span class="label-dot"></span> Challenger B</label>
         <div class="input-wrapper">
           <div class="address-icon" id="iconB"><div class="icon-inner"></div></div>
-          <input
-            type="text"
-            id="walletB"
-            class="wallet-input"
-            placeholder="Enter wallet address (0x...)"
-            spellcheck="false"
-            autocomplete="off"
-            maxlength="42"
-          >
+          <input type="text" id="walletB" class="wallet-input" placeholder="0x..." spellcheck="false" autocomplete="off" maxlength="42">
           <span class="validation-indicator"></span>
         </div>
       </div>
-
     </div>
 
-    <!-- Chain selector -->
     <div class="chain-row">
-      <span class="chain-label">Chain</span>
+      <span class="chain-label">chain</span>
       <select class="chain-select" id="chainSelect">
         <option value="base">Base</option>
         <option value="ethereum">Ethereum</option>
@@ -890,26 +915,128 @@
       </select>
     </div>
 
-    <!-- Error -->
     <div class="error-msg" id="errorMsg"></div>
 
-    <!-- Battle button -->
     <button type="submit" class="battle-btn" id="battleBtn" disabled>
       <span class="btn-text">Battle!</span>
       <div class="spinner"></div>
     </button>
-    <div style="text-align:center">
-      <span class="free-badge">1 free battle per day &middot; 0.50 USDC = 5 more</span>
-    </div>
 
+    <div class="tier-info">
+      <span class="free">1 free battle/day</span> &middot; <span class="paid">0.50 USDC = 5 more</span> via MetaMask or x402
+    </div>
   </form>
+
+  <!-- How It Works -->
+  <section class="how-section">
+    <h2 class="section-header">How Battles Work</h2>
+    <div class="how-grid">
+      <div class="stat-card">
+        <div class="stat-icon">&#x2694;&#xFE0F;</div>
+        <div class="stat-name">ATK</div>
+        <div class="stat-source">PnL, win rate, volume, traded tokens</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#x1F6E1;&#xFE0F;</div>
+        <div class="stat-name">DEF</div>
+        <div class="stat-source">Holding duration, unrealized PnL, patience</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#x1F4DA;</div>
+        <div class="stat-name">INT</div>
+        <div class="stat-source">Token diversity, DEX variety, counterparties</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#x26A1;</div>
+        <div class="stat-name">SPD</div>
+        <div class="stat-source">Tx frequency, recency, last seen freshness</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#x1F91D;</div>
+        <div class="stat-name">CHA</div>
+        <div class="stat-source">Network size, labeled counterparties, types</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#x1F340;</div>
+        <div class="stat-name">LCK</div>
+        <div class="stat-source">Portfolio safety, PnL stability, no rugs</div>
+      </div>
+    </div>
+    <p class="how-desc">
+      Each stat is scored 0-100 from real Nansen data. Total score determines the winner.<br>
+      Wallet gets a title (e.g. "Degen Warrior"), level (1-99), and rarity tier.
+    </p>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing-section">
+    <h2 class="section-header">Pricing</h2>
+    <div class="pricing-cards">
+      <div class="price-card">
+        <div class="price-label">Free Tier</div>
+        <div class="price-amount">$0</div>
+        <div class="price-unit">per day</div>
+        <div class="price-detail"><strong>1 battle</strong> per day<br>Full stats + OG image</div>
+      </div>
+      <div class="price-card premium">
+        <div class="price-label">Battle Pack</div>
+        <div class="price-amount">$0.50</div>
+        <div class="price-unit">USDC on Base</div>
+        <div class="price-detail"><strong>5 battles</strong> per pack<br>Pay via wallet or x402 header</div>
+        <div class="payment-methods">
+          <span class="method-tag wallet">MetaMask</span>
+          <span class="method-tag x402">x402 Protocol</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For AI Agents -->
+  <section class="agents-section">
+    <h2 class="section-header">For AI Agents</h2>
+    <div class="agents-card">
+      <div class="agents-header">
+        <span class="agents-icon">&#x1F916;</span>
+        <span class="agents-title">MCP Tool: wallet_battle</span>
+      </div>
+      <p class="agents-desc">
+        This battle arena runs as an <strong style="color:#44ffff">MCP server</strong> (JSON-RPC 2.0 over stdio).
+        AI agents can call <code style="color:var(--neon)">wallet_battle</code> to compare wallets programmatically.
+        Payments work via the <strong style="color:#44ffff">x402 protocol</strong> &mdash; just include the
+        <code style="color:var(--neon)">X-Payment</code> header.
+      </p>
+      <div class="code-block">
+        <span class="comment">// MCP tool call</span><br>
+        { <span class="key">"method"</span>: <span class="str">"tools/call"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"params"</span>: { <span class="key">"name"</span>: <span class="str">"wallet_battle"</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"arguments"</span>: {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"wallet_a"</span>: <span class="str">"0xd8dA..."</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"wallet_b"</span>: <span class="str">"0x1234..."</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"chain"</span>: <span class="str">"base"</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+        &nbsp;&nbsp;}<br>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Battles -->
+  <section class="recent-section">
+    <h2 class="section-header">Recent Battles</h2>
+    <div class="recent-list" id="recentList">
+      <div class="empty-state" id="emptyState">
+        <span class="empty-icon">&#x1F3DF;&#xFE0F;</span>
+        No battles yet. Be the first!
+      </div>
+    </div>
+  </section>
 
   <!-- Paywall Modal -->
   <div class="paywall-overlay" id="paywallOverlay">
     <div class="paywall-card">
       <button class="paywall-close" id="paywallClose">&times;</button>
       <div class="paywall-icon">&#x26A1;</div>
-      <div class="paywall-title">UNLIMITED BATTLES</div>
+      <div class="paywall-title">BATTLE PACK</div>
       <p class="paywall-desc">You've used your free battle today.<br>Pay 0.50 USDC to get 5 more battles.</p>
       <div class="paywall-price">
         <span class="paywall-amount">0.50</span>
@@ -922,27 +1049,18 @@
       </button>
       <div class="paywall-status" id="payStatus"></div>
       <div class="no-wallet-hint" id="noWalletHint">
-        No wallet detected. Install <a href="https://metamask.io" target="_blank" rel="noopener" style="color:#ffaa00">MetaMask</a> or another Web3 wallet to pay with USDC.
+        No wallet detected. Install <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> or use the <strong>x402 API header</strong> instead.
       </div>
-      <div class="paywall-or">&#x2500;&#x2500;&#x2500; OR &#x2500;&#x2500;&#x2500;</div>
+      <div class="paywall-or">// OR //</div>
       <div class="paywall-wait" id="paywallWait">Come back tomorrow for another free battle</div>
     </div>
   </div>
 
-  <!-- Recent Battles -->
-  <section class="recent-section">
-    <h2 class="section-title">Recent Battles</h2>
-    <div class="recent-list" id="recentList">
-      <div class="empty-state" id="emptyState">
-        <span class="empty-icon">&#x1F3DF;&#xFE0F;</span>
-        No battles yet. Be the first!
-      </div>
-    </div>
-  </section>
-
   <!-- Footer -->
   <footer class="footer">
-    Powered by <a href="https://nansen.ai" target="_blank" rel="noopener">Nansen CLI</a> &middot; Built for <strong>#NansenCLI</strong> hackathon
+    Built for <strong style="color:var(--neon);opacity:0.6">#NansenCLI</strong> hackathon &middot;
+    Powered by <a href="https://nansen.ai" target="_blank" rel="noopener">Nansen</a> &middot;
+    Payments via x402 on Base
   </footer>
 
 </div>
@@ -951,390 +1069,152 @@
 (function() {
   'use strict';
 
-  // ── USDC on Base ──
-  const USDC_CONTRACT = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-  const USDC_DECIMALS = 6;
-  const BATTLE_PRICE = 0.50;
-  const BATTLE_PRICE_WEI = '500000'; // 0.50 * 10^6
-  const BASE_CHAIN_ID = '0x2105'; // 8453
+  var USDC_CONTRACT = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+  var BATTLE_PRICE_WEI = '500000';
+  var BASE_CHAIN_ID = '0x2105';
+  var ERC20_TRANSFER_ABI = '0xa9059cbb';
 
-  // ERC20 transfer ABI (minimal)
-  const ERC20_TRANSFER_ABI = '0xa9059cbb'; // transfer(address,uint256)
+  var paymentProof = null;
+  var pendingPaymentInfo = null;
 
-  // ── State ──
-  let paymentProof = null; // stored X-Payment header after successful payment
-  let pendingPaymentInfo = null; // server-provided payment details from 402
+  var walletA    = document.getElementById('walletA');
+  var walletB    = document.getElementById('walletB');
+  var iconA      = document.getElementById('iconA').querySelector('.icon-inner');
+  var iconB      = document.getElementById('iconB').querySelector('.icon-inner');
+  var chainSel   = document.getElementById('chainSelect');
+  var battleBtn  = document.getElementById('battleBtn');
+  var battleForm = document.getElementById('battleForm');
+  var errorMsg   = document.getElementById('errorMsg');
+  var recentList = document.getElementById('recentList');
+  var emptyState = document.getElementById('emptyState');
+  var paywallOverlay = document.getElementById('paywallOverlay');
+  var paywallClose   = document.getElementById('paywallClose');
+  var payBtn         = document.getElementById('payBtn');
+  var payStatus      = document.getElementById('payStatus');
+  var noWalletHint   = document.getElementById('noWalletHint');
+  var paywallWait    = document.getElementById('paywallWait');
 
-  // ── Elements ──
-  const walletA    = document.getElementById('walletA');
-  const walletB    = document.getElementById('walletB');
-  const iconA      = document.getElementById('iconA').querySelector('.icon-inner');
-  const iconB      = document.getElementById('iconB').querySelector('.icon-inner');
-  const chainSel   = document.getElementById('chainSelect');
-  const battleBtn  = document.getElementById('battleBtn');
-  const battleForm = document.getElementById('battleForm');
-  const errorMsg   = document.getElementById('errorMsg');
-  const recentList = document.getElementById('recentList');
-  const emptyState = document.getElementById('emptyState');
+  var ADDR_RE = /^0x[0-9a-fA-F]{40}$/;
 
-  // Paywall elements
-  const paywallOverlay = document.getElementById('paywallOverlay');
-  const paywallClose   = document.getElementById('paywallClose');
-  const payBtn         = document.getElementById('payBtn');
-  const payStatus      = document.getElementById('payStatus');
-  const noWalletHint   = document.getElementById('noWalletHint');
-  const paywallWait    = document.getElementById('paywallWait');
-
-  // ── Address validation ──
-  const ADDR_RE = /^0x[0-9a-fA-F]{40}$/;
-
-  function isValidAddress(addr) {
-    return ADDR_RE.test(addr);
-  }
+  function isValid(a) { return ADDR_RE.test(a); }
 
   function validateInput(input) {
-    const val = input.value.trim();
-    if (val.length === 0) {
-      input.classList.remove('valid', 'invalid');
-      return false;
-    }
-    const valid = isValidAddress(val);
-    input.classList.toggle('valid', valid);
-    input.classList.toggle('invalid', !valid);
-    return valid;
+    var v = input.value.trim();
+    if (!v.length) { input.classList.remove('valid','invalid'); return false; }
+    var ok = isValid(v);
+    input.classList.toggle('valid', ok);
+    input.classList.toggle('invalid', !ok);
+    return ok;
   }
 
-  function updateBattleBtn() {
-    const aOk = isValidAddress(walletA.value.trim());
-    const bOk = isValidAddress(walletB.value.trim());
-    battleBtn.disabled = !(aOk && bOk);
+  function updateBtn() { battleBtn.disabled = !(isValid(walletA.value.trim()) && isValid(walletB.value.trim())); }
+
+  function updateIcon(el, addr) {
+    var v = addr.trim();
+    if (/^0x[a-fA-F0-9]{40}$/.test(v)) {
+      var s = encodeURIComponent(v.toLowerCase());
+      el.innerHTML = '<img src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=' + s + '&size=48&backgroundColor=transparent" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">';
+      el.style.background = 'transparent';
+    } else { el.innerHTML = ''; el.style.background = 'rgba(0,230,118,0.05)'; }
   }
 
-  // ── Deterministic color from address ──
-  function addressToColor(addr) {
-    if (!addr || addr.length < 6) return 'rgba(255,255,255,0.05)';
-    var hex = addr.slice(2, 8);
-    var r = parseInt(hex.slice(0, 2), 16);
-    var g = parseInt(hex.slice(2, 4), 16);
-    var b = parseInt(hex.slice(4, 6), 16);
-    var max = Math.max(r, g, b, 1);
-    var factor = 220 / max;
-    return 'rgb(' +
-      Math.round(Math.min(r * factor, 255)) + ',' +
-      Math.round(Math.min(g * factor, 255)) + ',' +
-      Math.round(Math.min(b * factor, 255)) + ')';
-  }
+  walletA.addEventListener('input', function() { validateInput(walletA); updateBtn(); updateIcon(iconA, walletA.value); });
+  walletB.addEventListener('input', function() { validateInput(walletB); updateBtn(); updateIcon(iconB, walletB.value); });
 
-  function addressToGradient(addr) {
-    if (!addr || addr.length < 12) return 'rgba(255,255,255,0.05)';
-    var c1 = addressToColor(addr);
-    var hex2 = addr.slice(8, 14) || addr.slice(2, 8);
-    var r2 = parseInt(hex2.slice(0, 2), 16);
-    var g2 = parseInt(hex2.slice(2, 4), 16);
-    var b2 = parseInt(hex2.slice(4, 6), 16);
-    var max2 = Math.max(r2, g2, b2, 1);
-    var f2 = 200 / max2;
-    var c2 = 'rgb(' +
-      Math.round(Math.min(r2 * f2, 255)) + ',' +
-      Math.round(Math.min(g2 * f2, 255)) + ',' +
-      Math.round(Math.min(b2 * f2, 255)) + ')';
-    return 'linear-gradient(135deg, ' + c1 + ', ' + c2 + ')';
-  }
+  async function submitBattle(withPay) {
+    var a = walletA.value.trim(), b = walletB.value.trim(), ch = chainSel.value;
+    if (!isValid(a) || !isValid(b)) return;
+    setLoading(true); hideError();
 
-  function updateIcon(iconEl, addr) {
-    var val = addr.trim();
-    if (/^0x[a-fA-F0-9]{40}$/.test(val)) {
-      var seed = encodeURIComponent(val.toLowerCase());
-      iconEl.innerHTML = '<img src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=' + seed + '&size=48&backgroundColor=transparent" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">';
-      iconEl.style.background = 'transparent';
-    } else if (val.length >= 6 && val.startsWith('0x')) {
-      iconEl.innerHTML = '';
-      iconEl.style.background = addressToGradient(val);
-    } else {
-      iconEl.innerHTML = '';
-      iconEl.style.background = 'rgba(255,255,255,0.05)';
-    }
-  }
-
-  // ── Input handlers ──
-  walletA.addEventListener('input', function() {
-    validateInput(walletA);
-    updateBattleBtn();
-    updateIcon(iconA, walletA.value);
-  });
-
-  walletB.addEventListener('input', function() {
-    validateInput(walletB);
-    updateBattleBtn();
-    updateIcon(iconB, walletB.value);
-  });
-
-  // ── Battle submission ──
-  async function submitBattle(withPayment) {
-    var addrA = walletA.value.trim();
-    var addrB = walletB.value.trim();
-    var chain = chainSel.value;
-
-    if (!isValidAddress(addrA) || !isValidAddress(addrB)) return;
-
-    setLoading(true);
-    hideError();
-
-    var headers = { 'Content-Type': 'application/json' };
-    if (withPayment && paymentProof) {
-      headers['X-Payment'] = paymentProof;
-    }
+    var hdrs = { 'Content-Type': 'application/json' };
+    if (withPay && paymentProof) hdrs['X-Payment'] = paymentProof;
 
     try {
-      var resp = await fetch('/api/battle', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({ wallet_a: addrA, wallet_b: addrB, chain: chain })
-      });
-
+      var resp = await fetch('/api/battle', { method: 'POST', headers: hdrs, body: JSON.stringify({ wallet_a: a, wallet_b: b, chain: ch }) });
       var data = await resp.json();
 
-      // 402 = Payment Required (rate limit exceeded, pay to continue)
-      if (resp.status === 402) {
-        pendingPaymentInfo = data.payment || null;
-        if (pendingPaymentInfo) {
-          paywallWait.textContent = data.message || 'Come back tomorrow for another free battle';
-        }
-        showPaywall();
-        return;
-      }
+      if (resp.status === 402) { pendingPaymentInfo = data.payment || null; if (pendingPaymentInfo) paywallWait.textContent = data.message; showPaywall(); return; }
+      if (!resp.ok) throw new Error(data.error || data.message || 'Battle failed');
 
-      if (!resp.ok) {
-        throw new Error(data.error || data.message || ('Battle failed (HTTP ' + resp.status + ')'));
-      }
-
-      var battleId = data.id || data.battle_id || data.battleId;
-      if (battleId) {
-        window.location.href = '/battle/' + battleId;
-      } else {
-        throw new Error('No battle ID returned from server');
-      }
-
-    } catch (err) {
-      showError(err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+      var bid = data.id || data.battle_id || data.battleId;
+      if (bid) window.location.href = '/battle/' + bid;
+      else throw new Error('No battle ID');
+    } catch (err) { showError(err.message); } finally { setLoading(false); }
   }
 
-  battleForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    submitBattle(!!paymentProof);
-  });
+  battleForm.addEventListener('submit', function(e) { e.preventDefault(); submitBattle(!!paymentProof); });
 
-  function setLoading(on) {
-    battleBtn.classList.toggle('loading', on);
-    battleBtn.disabled = on || !(isValidAddress(walletA.value.trim()) && isValidAddress(walletB.value.trim()));
-  }
+  function setLoading(on) { battleBtn.classList.toggle('loading', on); battleBtn.disabled = on || !(isValid(walletA.value.trim()) && isValid(walletB.value.trim())); }
+  function showError(m) { errorMsg.textContent = m; errorMsg.classList.add('visible'); }
+  function hideError() { errorMsg.textContent = ''; errorMsg.classList.remove('visible'); }
 
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.classList.add('visible');
-  }
-
-  function hideError() {
-    errorMsg.textContent = '';
-    errorMsg.classList.remove('visible');
-  }
-
-  // ══════════════════════════════════════
-  //  PAYWALL + WALLET CONNECT + USDC PAY
-  // ══════════════════════════════════════
-
-  function showPaywall() {
-    paywallOverlay.classList.add('visible');
-    payStatus.textContent = '';
-    payBtn.classList.remove('loading');
-    payBtn.disabled = false;
-
-    // Check if MetaMask / Web3 wallet is available
-    if (!window.ethereum) {
-      noWalletHint.style.display = 'block';
-      payBtn.disabled = true;
-    } else {
-      noWalletHint.style.display = 'none';
-    }
-  }
-
-  function hidePaywall() {
-    paywallOverlay.classList.remove('visible');
-  }
-
+  // ── Paywall ──
+  function showPaywall() { paywallOverlay.classList.add('visible'); payStatus.textContent = ''; payBtn.classList.remove('loading'); payBtn.disabled = !window.ethereum; noWalletHint.style.display = window.ethereum ? 'none' : 'block'; }
+  function hidePaywall() { paywallOverlay.classList.remove('visible'); }
   paywallClose.addEventListener('click', hidePaywall);
-  paywallOverlay.addEventListener('click', function(e) {
-    if (e.target === paywallOverlay) hidePaywall();
-  });
+  paywallOverlay.addEventListener('click', function(e) { if (e.target === paywallOverlay) hidePaywall(); });
 
-  // ── Pay with MetaMask ──
   payBtn.addEventListener('click', async function() {
-    if (!window.ethereum) {
-      noWalletHint.style.display = 'block';
-      return;
-    }
-
+    if (!window.ethereum) { noWalletHint.style.display = 'block'; return; }
     var recipient = pendingPaymentInfo?.recipient;
-    if (!recipient || recipient === '0x0000000000000000000000000000000000000000') {
-      payStatus.textContent = 'Payment not configured on server. Contact admin.';
-      payStatus.style.color = '#ff6666';
-      return;
-    }
+    if (!recipient || recipient === '0x0000000000000000000000000000000000000000') { payStatus.textContent = 'Payment not configured. Contact admin.'; payStatus.style.color = '#ff6666'; return; }
 
-    payBtn.classList.add('loading');
-    payBtn.disabled = true;
-    payStatus.textContent = 'Connecting wallet...';
-    payStatus.style.color = 'rgba(200,200,220,0.5)';
+    payBtn.classList.add('loading'); payBtn.disabled = true;
+    payStatus.textContent = 'Connecting wallet...'; payStatus.style.color = 'var(--text-dim)';
 
     try {
-      // 1. Request account access
       var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       var sender = accounts[0];
       payStatus.textContent = 'Connected: ' + sender.slice(0, 6) + '...' + sender.slice(-4);
 
-      // 2. Switch to Base network if needed
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: BASE_CHAIN_ID }]
-        });
-      } catch (switchErr) {
-        // Chain not added, try to add Base
-        if (switchErr.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: BASE_CHAIN_ID,
-              chainName: 'Base',
-              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-              rpcUrls: ['https://mainnet.base.org'],
-              blockExplorerUrls: ['https://basescan.org']
-            }]
-          });
-        } else {
-          throw switchErr;
-        }
-      }
-      payStatus.textContent = 'Switched to Base network...';
-
-      // 3. Build ERC20 transfer calldata
-      // transfer(address to, uint256 amount)
-      var recipientPadded = recipient.slice(2).toLowerCase().padStart(64, '0');
-      var amountHex = parseInt(BATTLE_PRICE_WEI).toString(16).padStart(64, '0');
-      var calldata = ERC20_TRANSFER_ABI + recipientPadded + amountHex;
+      try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] }); }
+      catch (sw) { if (sw.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: BASE_CHAIN_ID, chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] }); else throw sw; }
 
       payStatus.textContent = 'Confirm USDC transfer in your wallet...';
+      var rp = recipient.slice(2).toLowerCase().padStart(64, '0');
+      var am = parseInt(BATTLE_PRICE_WEI).toString(16).padStart(64, '0');
+      var txHash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: sender, to: USDC_CONTRACT, data: ERC20_TRANSFER_ABI + rp + am, value: '0x0' }] });
 
-      // 4. Send ERC20 transfer transaction
-      var txHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: sender,
-          to: USDC_CONTRACT,
-          data: calldata,
-          value: '0x0'
-        }]
-      });
-
-      payStatus.textContent = 'Payment sent! Tx: ' + txHash.slice(0, 10) + '...';
-      payStatus.style.color = '#44ff88';
-
-      // 5. Build x402 payment proof header
+      payStatus.textContent = 'Payment sent! Starting battle...'; payStatus.style.color = '#00e676';
       paymentProof = 'USDC:' + recipient + ':' + BATTLE_PRICE_WEI + ':' + txHash;
-
-      // 6. Wait a moment, then auto-retry the battle
-      payStatus.textContent = 'Payment confirmed! Starting battle...';
-      setTimeout(function() {
-        hidePaywall();
-        submitBattle(true);
-      }, 1500);
-
+      setTimeout(function() { hidePaywall(); submitBattle(true); }, 1500);
     } catch (err) {
-      payBtn.classList.remove('loading');
-      payBtn.disabled = false;
-
-      if (err.code === 4001) {
-        payStatus.textContent = 'Transaction rejected by user.';
-        payStatus.style.color = '#ff6666';
-      } else {
-        payStatus.textContent = 'Error: ' + (err.message || 'Transaction failed').slice(0, 80);
-        payStatus.style.color = '#ff6666';
-      }
+      payBtn.classList.remove('loading'); payBtn.disabled = false;
+      payStatus.textContent = err.code === 4001 ? 'Transaction rejected.' : 'Error: ' + (err.message || '').slice(0, 80);
+      payStatus.style.color = '#ff6666';
     }
   });
 
-  // ══════════════════════════════
-  //  RECENT BATTLES
-  // ══════════════════════════════
-
-  async function loadRecentBattles() {
+  // ── Recent Battles ──
+  async function loadRecent() {
     try {
       var resp = await fetch('/api/battle/recent/list');
       if (!resp.ok) return;
-      var data = await resp.json();
-      var battles = data.battles || data.data || data;
-
-      if (!Array.isArray(battles) || battles.length === 0) return;
-
+      var list = await resp.json();
+      var battles = list.battles || list.data || list;
+      if (!Array.isArray(battles) || !battles.length) return;
       emptyState.style.display = 'none';
-
-      var fragment = document.createDocumentFragment();
-      var shown = battles.slice(0, 5);
-
-      shown.forEach(function(b) {
+      var frag = document.createDocumentFragment();
+      battles.slice(0, 5).forEach(function(b) {
         var a = document.createElement('a');
-        var bid = b.id || b.battle_id || b.battleId;
-        a.href = '/battle/' + bid;
+        a.href = '/battle/' + (b.id || b.battleId);
         a.className = 'recent-card';
-
-        var addrA = b.wallet_a || b.walletA || b.challenger_a || '';
-        var addrB = b.wallet_b || b.walletB || b.challenger_b || '';
-        var winner = b.winner || b.result || '';
-
-        var badgeClass = 'draw';
-        var badgeText  = 'DRAW';
-        if (winner && winner.toLowerCase() === addrA.toLowerCase()) {
-          badgeClass = 'winner-a'; badgeText = 'A WINS';
-        } else if (winner && winner.toLowerCase() === addrB.toLowerCase()) {
-          badgeClass = 'winner-b'; badgeText = 'B WINS';
-        } else if (winner === 'a' || winner === 'A') {
-          badgeClass = 'winner-a'; badgeText = 'A WINS';
-        } else if (winner === 'b' || winner === 'B') {
-          badgeClass = 'winner-b'; badgeText = 'B WINS';
-        }
-
-        var seedA = encodeURIComponent(addrA.toLowerCase());
-
-        a.innerHTML =
-          '<span class="recent-dot" style="background:transparent;overflow:hidden"><img src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=' + seedA + '&size=24&backgroundColor=transparent" style="width:100%;height:100%;border-radius:50%"></span>' +
-          '<span class="recent-addresses">' +
-            '<span class="recent-addr addr-a" title="' + addrA + '">' + truncAddr(addrA) + '</span>' +
-            '<span class="recent-vs">VS</span>' +
-            '<span class="recent-addr addr-b" title="' + addrB + '">' + truncAddr(addrB) + '</span>' +
-          '</span>' +
-          '<span class="winner-badge ' + badgeClass + '">' + badgeText + '</span>' +
-          '<span class="recent-arrow">&#x203A;</span>';
-
-        fragment.appendChild(a);
+        var aa = b.walletA || b.wallet_a || '', bb = b.walletB || b.wallet_b || '', w = b.winner || '';
+        var bc = 'draw', bt = 'DRAW';
+        if (w === 'a') { bc = 'winner-a'; bt = 'A WINS'; }
+        else if (w === 'b') { bc = 'winner-b'; bt = 'B WINS'; }
+        var sa = encodeURIComponent(aa.toLowerCase());
+        a.innerHTML = '<span class="recent-dot" style="background:transparent;overflow:hidden"><img src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=' + sa + '&size=24&backgroundColor=transparent" style="width:100%;height:100%;border-radius:50%"></span>' +
+          '<span class="recent-addresses"><span class="recent-addr addr-a" title="' + aa + '">' + trunc(aa) + '</span><span class="recent-vs">VS</span><span class="recent-addr addr-b" title="' + bb + '">' + trunc(bb) + '</span></span>' +
+          '<span class="winner-badge ' + bc + '">' + bt + '</span><span class="recent-arrow">&#x203A;</span>';
+        frag.appendChild(a);
       });
-
-      recentList.appendChild(fragment);
-
-    } catch (err) {
-      // Silently fail
-    }
+      recentList.appendChild(frag);
+    } catch (e) {}
   }
 
-  function truncAddr(addr) {
-    if (!addr || addr.length < 10) return addr || '???';
-    return addr.slice(0, 6) + '\u2026' + addr.slice(-4);
-  }
-
-  loadRecentBattles();
-
+  function trunc(a) { return (!a || a.length < 10) ? (a || '???') : a.slice(0, 6) + '\u2026' + a.slice(-4); }
+  loadRecent();
 })();
 </script>
 
