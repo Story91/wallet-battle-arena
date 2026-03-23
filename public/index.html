@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet Battle Arena | Who's the Better Onchain Player?</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(255,100,50,0.6), 0 0 40px rgba(255,60,20,0.3), 0 0 80px rgba(255,40,0,0.15); }
+    50% { text-shadow: 0 0 30px rgba(255,120,60,0.8), 0 0 60px rgba(255,80,30,0.5), 0 0 100px rgba(255,50,10,0.25); }
+  }
+
+  @keyframes subtleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @keyframes buttonPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,80,30,0.4), 0 0 40px rgba(255,50,10,0.2), inset 0 0 20px rgba(255,255,255,0.05); }
+    50% { box-shadow: 0 0 30px rgba(255,100,40,0.6), 0 0 60px rgba(255,60,20,0.35), inset 0 0 30px rgba(255,255,255,0.08); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scanline {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+  }
+
+  @keyframes borderGlow {
+    0%, 100% { border-color: rgba(255,255,255,0.06); }
+    50% { border-color: rgba(255,255,255,0.12); }
+  }
+
+  @keyframes vsFlicker {
+    0%, 90%, 100% { opacity: 1; }
+    92% { opacity: 0.8; }
+    94% { opacity: 1; }
+    96% { opacity: 0.6; }
+    98% { opacity: 1; }
+  }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a1a;
+    color: #e0e0e8;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Top ambient glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(255,60,20,0.07) 0%, rgba(100,40,200,0.04) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .logo-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    display: block;
+    filter: drop-shadow(0 0 20px rgba(255,80,30,0.5));
+    animation: subtleFloat 4s ease-in-out infinite;
+  }
+
+  .title {
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ff6030, #ff3c14, #ff8040, #ffaa60);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glowPulse 3s ease-in-out infinite;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+
+  .subtitle {
+    font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+    color: rgba(200,200,220,0.6);
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    line-height: 1.5;
+  }
+
+  .subtitle strong {
+    color: rgba(220,220,240,0.85);
+    font-weight: 600;
+  }
+
+  /* ── Battle Form ── */
+  .battle-form {
+    width: 100%;
+    background: linear-gradient(170deg, rgba(18,18,40,0.85), rgba(12,12,28,0.95));
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 36px 32px;
+    backdrop-filter: blur(20px);
+    animation: fadeInUp 0.8s ease-out 0.15s both, borderGlow 4s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle diagonal scanline overlay */
+  .battle-form::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 3px,
+      rgba(255,255,255,0.008) 3px,
+      rgba(255,255,255,0.008) 4px
+    );
+    pointer-events: none;
+    border-radius: 20px;
+  }
+
+  .combatants {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+  }
+
+  /* VS divider */
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 4px 0;
+  }
+
+  .vs-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .vs-text {
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #ff4444, #aa44ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: vsFlicker 5s infinite;
+  }
+
+  /* Wallet input group */
+  .wallet-group {
+    position: relative;
+  }
+
+  .wallet-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .wallet-label.challenger-a { color: #ff4444; }
+  .wallet-label.challenger-b { color: #4488ff; }
+
+  .label-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .challenger-a .label-dot { background: #ff4444; box-shadow: 0 0 8px rgba(255,68,68,0.5); }
+  .challenger-b .label-dot { background: #4488ff; box-shadow: 0 0 8px rgba(68,136,255,0.5); }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .address-icon {
+    position: absolute;
+    left: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.08);
+    transition: all 0.3s ease;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .address-icon .icon-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+  }
+
+  .wallet-input {
+    width: 100%;
+    padding: 14px 16px 14px 50px;
+    background: rgba(10,10,30,0.7);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    color: #e0e0e8;
+    font-size: 0.9rem;
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    letter-spacing: 0.3px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .wallet-input::placeholder {
+    color: rgba(160,160,180,0.35);
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    letter-spacing: 0;
+  }
+
+  .wallet-input:focus {
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 0 20px rgba(100,100,255,0.08), 0 0 40px rgba(100,100,255,0.04);
+    background: rgba(12,12,35,0.9);
+  }
+
+  .wallet-group.challenger-a .wallet-input:focus {
+    border-color: rgba(255,68,68,0.4);
+    box-shadow: 0 0 20px rgba(255,68,68,0.1), 0 0 40px rgba(255,68,68,0.05);
+  }
+
+  .wallet-group.challenger-b .wallet-input:focus {
+    border-color: rgba(68,136,255,0.4);
+    box-shadow: 0 0 20px rgba(68,136,255,0.1), 0 0 40px rgba(68,136,255,0.05);
+  }
+
+  /* Validation states */
+  .wallet-input.valid {
+    border-color: rgba(50,205,100,0.4);
+    box-shadow: 0 0 12px rgba(50,205,100,0.1);
+  }
+
+  .wallet-input.invalid {
+    border-color: rgba(255,60,60,0.4);
+    box-shadow: 0 0 12px rgba(255,60,60,0.1);
+  }
+
+  .wallet-input.valid + .validation-indicator,
+  .wallet-input.invalid + .validation-indicator {
+    opacity: 1;
+  }
+
+  .validation-indicator {
+    position: absolute;
+    right: 14px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
+  .wallet-input.valid ~ .validation-indicator { color: #32cd64; }
+  .wallet-input.valid ~ .validation-indicator::after { content: '\2713'; }
+  .wallet-input.invalid ~ .validation-indicator { color: #ff3c3c; }
+  .wallet-input.invalid ~ .validation-indicator::after { content: '\2717'; }
+
+  /* Chain selector */
+  .chain-row {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .chain-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(180,180,200,0.5);
+    white-space: nowrap;
+  }
+
+  .chain-select {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(10,10,30,0.7);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    color: #e0e0e8;
+    font-size: 0.85rem;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  .chain-select:focus {
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 0 20px rgba(100,100,255,0.08);
+  }
+
+  .chain-select option {
+    background: #12122a;
+    color: #e0e0e8;
+  }
+
+  /* Error message */
+  .error-msg {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(255,40,40,0.08);
+    border: 1px solid rgba(255,40,40,0.2);
+    border-radius: 10px;
+    color: #ff6666;
+    font-size: 0.85rem;
+    display: none;
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* ── Battle Button ── */
+  .battle-btn {
+    width: 100%;
+    margin-top: 28px;
+    padding: 18px 32px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ff4020, #ff6030, #ff3818);
+    animation: buttonPulse 2.5s ease-in-out infinite;
+    transition: all 0.3s ease;
+  }
+
+  .battle-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.12) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+
+  .battle-btn:hover:not(:disabled)::before {
+    transform: translateX(100%);
+  }
+
+  .battle-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(255,80,30,0.5), 0 0 80px rgba(255,50,10,0.3);
+  }
+
+  .battle-btn:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .battle-btn:disabled {
+    background: linear-gradient(135deg, #2a2a3a, #1e1e2e);
+    color: rgba(255,255,255,0.2);
+    cursor: not-allowed;
+    animation: none;
+    box-shadow: none;
+  }
+
+  .battle-btn.loading {
+    pointer-events: none;
+    background: linear-gradient(135deg, #ff4020, #ff6030);
+  }
+
+  .battle-btn .btn-text { position: relative; z-index: 1; }
+
+  .battle-btn .spinner {
+    display: none;
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+  }
+
+  .battle-btn.loading .btn-text { display: none; }
+  .battle-btn.loading .spinner { display: block; }
+
+  /* ── Recent Battles ── */
+  .recent-section {
+    width: 100%;
+    margin-top: 56px;
+    animation: fadeInUp 0.8s ease-out 0.3s both;
+  }
+
+  .section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(180,180,200,0.4);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .section-title::before,
+  .section-title::after {
+    content: '\2500\2500\2500  ';
+    color: rgba(180,180,200,0.15);
+  }
+  .section-title::after {
+    content: '  \2500\2500\2500';
+  }
+
+  .recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .recent-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(18,18,40,0.6);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .recent-card:hover {
+    background: rgba(25,25,55,0.8);
+    border-color: rgba(255,255,255,0.1);
+    transform: translateX(4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .recent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .recent-addresses {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.78rem;
+    color: rgba(200,200,220,0.7);
+    min-width: 0;
+  }
+
+  .recent-addr {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+  }
+
+  .recent-addr.addr-a { color: rgba(255,100,100,0.8); }
+  .recent-addr.addr-b { color: rgba(100,160,255,0.8); }
+
+  .recent-vs {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba(180,180,200,0.3);
+    flex-shrink: 0;
+  }
+
+  .winner-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .winner-badge.winner-a {
+    background: rgba(255,68,68,0.15);
+    color: #ff6666;
+    border: 1px solid rgba(255,68,68,0.2);
+  }
+
+  .winner-badge.winner-b {
+    background: rgba(68,136,255,0.15);
+    color: #6699ff;
+    border: 1px solid rgba(68,136,255,0.2);
+  }
+
+  .winner-badge.draw {
+    background: rgba(180,180,200,0.1);
+    color: rgba(180,180,200,0.6);
+    border: 1px solid rgba(180,180,200,0.15);
+  }
+
+  .recent-arrow {
+    color: rgba(255,255,255,0.15);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    transition: color 0.25s, transform 0.25s;
+  }
+
+  .recent-card:hover .recent-arrow {
+    color: rgba(255,255,255,0.4);
+    transform: translateX(2px);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    color: rgba(160,160,180,0.35);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .empty-state .empty-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+    filter: grayscale(0.5);
+    opacity: 0.5;
+  }
+
+  /* ── Free badge ── */
+  .free-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 14px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(68,255,136,0.8);
+    background: rgba(68,255,136,0.06);
+    border: 1px solid rgba(68,255,136,0.15);
+    border-radius: 8px;
+  }
+
+  /* ── Paywall Modal ── */
+  .paywall-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: rgba(5,5,15,0.85);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    animation: fadeInUp 0.3s ease-out;
+  }
+  .paywall-overlay.visible { display: flex; }
+
+  .paywall-card {
+    background: linear-gradient(170deg, rgba(20,20,50,0.95), rgba(12,12,30,0.98));
+    border: 1px solid rgba(255,200,0,0.15);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+  }
+
+  .paywall-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.3);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .paywall-close:hover { color: rgba(255,255,255,0.7); }
+
+  .paywall-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+  .paywall-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .paywall-desc {
+    font-size: 0.88rem;
+    color: rgba(200,200,220,0.6);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .paywall-price {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .paywall-amount {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  .paywall-currency {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(200,200,220,0.5);
+    letter-spacing: 1px;
+  }
+
+  .paywall-chain {
+    font-size: 0.7rem;
+    color: rgba(100,160,255,0.6);
+    letter-spacing: 1px;
+    display: block;
+    margin-top: -16px;
+    margin-bottom: 20px;
+  }
+
+  .pay-btn {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #0a0a1a;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ffd700, #ffaa00, #ff8800);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pay-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(255,200,0,0.3), 0 0 60px rgba(255,150,0,0.15);
+  }
+
+  .pay-btn:disabled {
+    background: linear-gradient(135deg, #3a3a4a, #2a2a3a);
+    color: rgba(255,255,255,0.25);
+    cursor: not-allowed;
+  }
+
+  .pay-btn .pay-spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(0,0,0,0.15);
+    border-top-color: #0a0a1a;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+  }
+  .pay-btn.loading .pay-text { display: none; }
+  .pay-btn.loading .pay-spinner { display: block; }
+
+  .paywall-status {
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: rgba(200,200,220,0.5);
+    min-height: 1.2em;
+  }
+
+  .paywall-or {
+    font-size: 0.75rem;
+    color: rgba(180,180,200,0.3);
+    margin-top: 16px;
+    letter-spacing: 1px;
+  }
+
+  .paywall-wait {
+    font-size: 0.78rem;
+    color: rgba(180,180,200,0.4);
+    margin-top: 6px;
+  }
+
+  .no-wallet-hint {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: rgba(255,100,50,0.06);
+    border: 1px solid rgba(255,100,50,0.12);
+    border-radius: 10px;
+    font-size: 0.78rem;
+    color: rgba(255,150,100,0.6);
+    display: none;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 0.72rem;
+    color: rgba(120,120,150,0.35);
+    letter-spacing: 1px;
+    animation: fadeInUp 0.8s ease-out 0.45s both;
+    line-height: 1.8;
+  }
+
+  .footer a {
+    color: rgba(160,160,200,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer a:hover {
+    color: rgba(200,200,240,0.7);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 540px) {
+    .container { padding: 28px 14px 40px; }
+    .battle-form { padding: 24px 18px; }
+    .wallet-input { font-size: 0.78rem; padding-left: 44px; }
+    .recent-addr { max-width: 90px; }
+    .chain-row { flex-direction: column; align-items: stretch; gap: 6px; }
+    .title { letter-spacing: 3px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <span class="logo-icon" aria-hidden="true">&#x2694;&#xFE0F;</span>
+    <h1 class="title">Wallet Battle<br>Arena</h1>
+    <p class="subtitle">Who's the better onchain player?<br>Powered by <strong>Nansen CLI</strong></p>
+  </header>
+
+  <!-- Battle Form -->
+  <form class="battle-form" id="battleForm" autocomplete="off">
+
+    <div class="combatants">
+
+      <!-- Challenger A -->
+      <div class="wallet-group challenger-a">
+        <label class="wallet-label challenger-a" for="walletA">
+          <span class="label-dot"></span>
+          Challenger A
+        </label>
+        <div class="input-wrapper">
+          <div class="address-icon" id="iconA"><div class="icon-inner"></div></div>
+          <input
+            type="text"
+            id="walletA"
+            class="wallet-input"
+            placeholder="Enter wallet address (0x...)"
+            spellcheck="false"
+            autocomplete="off"
+            maxlength="42"
+          >
+          <span class="validation-indicator"></span>
+        </div>
+      </div>
+
+      <!-- VS -->
+      <div class="vs-divider">
+        <span class="vs-line"></span>
+        <span class="vs-text">VS</span>
+        <span class="vs-line"></span>
+      </div>
+
+      <!-- Challenger B -->
+      <div class="wallet-group challenger-b">
+        <label class="wallet-label challenger-b" for="walletB">
+          <span class="label-dot"></span>
+          Challenger B
+        </label>
+        <div class="input-wrapper">
+          <div class="address-icon" id="iconB"><div class="icon-inner"></div></div>
+          <input
+            type="text"
+            id="walletB"
+            class="wallet-input"
+            placeholder="Enter wallet address (0x...)"
+            spellcheck="false"
+            autocomplete="off"
+            maxlength="42"
+          >
+          <span class="validation-indicator"></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chain selector -->
+    <div class="chain-row">
+      <span class="chain-label">Chain</span>
+      <select class="chain-select" id="chainSelect">
+        <option value="base">Base</option>
+        <option value="ethereum">Ethereum</option>
+        <option value="solana">Solana</option>
+        <option value="arbitrum">Arbitrum</option>
+        <option value="optimism">Optimism</option>
+      </select>
+    </div>
+
+    <!-- Error -->
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- Battle button -->
+    <button type="submit" class="battle-btn" id="battleBtn" disabled>
+      <span class="btn-text">Battle!</span>
+      <div class="spinner"></div>
+    </button>
+    <div style="text-align:center">
+      <span class="free-badge">1 free battle per day &middot; 0.50 USDC = 5 more</span>
+    </div>
+
+  </form>
+
+  <!-- Paywall Modal -->
+  <div class="paywall-overlay" id="paywallOverlay">
+    <div class="paywall-card">
+      <button class="paywall-close" id="paywallClose">&times;</button>
+      <div class="paywall-icon">&#x26A1;</div>
+      <div class="paywall-title">UNLIMITED BATTLES</div>
+      <p class="paywall-desc">You've used your free battle today.<br>Pay 0.50 USDC to get 5 more battles.</p>
+      <div class="paywall-price">
+        <span class="paywall-amount">0.50</span>
+        <span class="paywall-currency">USDC</span>
+      </div>
+      <span class="paywall-chain">on Base network</span>
+      <button class="pay-btn" id="payBtn">
+        <span class="pay-text">Connect Wallet &amp; Pay</span>
+        <div class="pay-spinner"></div>
+      </button>
+      <div class="paywall-status" id="payStatus"></div>
+      <div class="no-wallet-hint" id="noWalletHint">
+        No wallet detected. Install <a href="https://metamask.io" target="_blank" rel="noopener" style="color:#ffaa00">MetaMask</a> or another Web3 wallet to pay with USDC.
+      </div>
+      <div class="paywall-or">&#x2500;&#x2500;&#x2500; OR &#x2500;&#x2500;&#x2500;</div>
+      <div class="paywall-wait" id="paywallWait">Come back tomorrow for another free battle</div>
+    </div>
+  </div>
+
+  <!-- Recent Battles -->
+  <section class="recent-section">
+    <h2 class="section-title">Recent Battles</h2>
+    <div class="recent-list" id="recentList">
+      <div class="empty-state" id="emptyState">
+        <span class="empty-icon">&#x1F3DF;&#xFE0F;</span>
+        No battles yet. Be the first!
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Powered by <a href="https://nansen.ai" target="_blank" rel="noopener">Nansen CLI</a> &middot; Built for <strong>#NansenCLI</strong> hackathon
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── USDC on Base ──
+  const USDC_CONTRACT = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+  const USDC_DECIMALS = 6;
+  const BATTLE_PRICE = 0.50;
+  const BATTLE_PRICE_WEI = '500000'; // 0.50 * 10^6
+  const BASE_CHAIN_ID = '0x2105'; // 8453
+
+  // ERC20 transfer ABI (minimal)
+  const ERC20_TRANSFER_ABI = '0xa9059cbb'; // transfer(address,uint256)
+
+  // ── State ──
+  let paymentProof = null; // stored X-Payment header after successful payment
+  let pendingPaymentInfo = null; // server-provided payment details from 402
+
+  // ── Elements ──
+  const walletA    = document.getElementById('walletA');
+  const walletB    = document.getElementById('walletB');
+  const iconA      = document.getElementById('iconA').querySelector('.icon-inner');
+  const iconB      = document.getElementById('iconB').querySelector('.icon-inner');
+  const chainSel   = document.getElementById('chainSelect');
+  const battleBtn  = document.getElementById('battleBtn');
+  const battleForm = document.getElementById('battleForm');
+  const errorMsg   = document.getElementById('errorMsg');
+  const recentList = document.getElementById('recentList');
+  const emptyState = document.getElementById('emptyState');
+
+  // Paywall elements
+  const paywallOverlay = document.getElementById('paywallOverlay');
+  const paywallClose   = document.getElementById('paywallClose');
+  const payBtn         = document.getElementById('payBtn');
+  const payStatus      = document.getElementById('payStatus');
+  const noWalletHint   = document.getElementById('noWalletHint');
+  const paywallWait    = document.getElementById('paywallWait');
+
+  // ── Address validation ──
+  const ADDR_RE = /^0x[0-9a-fA-F]{40}$/;
+
+  function isValidAddress(addr) {
+    return ADDR_RE.test(addr);
+  }
+
+  function validateInput(input) {
+    const val = input.value.trim();
+    if (val.length === 0) {
+      input.classList.remove('valid', 'invalid');
+      return false;
+    }
+    const valid = isValidAddress(val);
+    input.classList.toggle('valid', valid);
+    input.classList.toggle('invalid', !valid);
+    return valid;
+  }
+
+  function updateBattleBtn() {
+    const aOk = isValidAddress(walletA.value.trim());
+    const bOk = isValidAddress(walletB.value.trim());
+    battleBtn.disabled = !(aOk && bOk);
+  }
+
+  // ── Deterministic color from address ──
+  function addressToColor(addr) {
+    if (!addr || addr.length < 6) return 'rgba(255,255,255,0.05)';
+    var hex = addr.slice(2, 8);
+    var r = parseInt(hex.slice(0, 2), 16);
+    var g = parseInt(hex.slice(2, 4), 16);
+    var b = parseInt(hex.slice(4, 6), 16);
+    var max = Math.max(r, g, b, 1);
+    var factor = 220 / max;
+    return 'rgb(' +
+      Math.round(Math.min(r * factor, 255)) + ',' +
+      Math.round(Math.min(g * factor, 255)) + ',' +
+      Math.round(Math.min(b * factor, 255)) + ')';
+  }
+
+  function addressToGradient(addr) {
+    if (!addr || addr.length < 12) return 'rgba(255,255,255,0.05)';
+    var c1 = addressToColor(addr);
+    var hex2 = addr.slice(8, 14) || addr.slice(2, 8);
+    var r2 = parseInt(hex2.slice(0, 2), 16);
+    var g2 = parseInt(hex2.slice(2, 4), 16);
+    var b2 = parseInt(hex2.slice(4, 6), 16);
+    var max2 = Math.max(r2, g2, b2, 1);
+    var f2 = 200 / max2;
+    var c2 = 'rgb(' +
+      Math.round(Math.min(r2 * f2, 255)) + ',' +
+      Math.round(Math.min(g2 * f2, 255)) + ',' +
+      Math.round(Math.min(b2 * f2, 255)) + ')';
+    return 'linear-gradient(135deg, ' + c1 + ', ' + c2 + ')';
+  }
+
+  function updateIcon(iconEl, addr) {
+    var val = addr.trim();
+    if (/^0x[a-fA-F0-9]{40}$/.test(val)) {
+      var seed = encodeURIComponent(val.toLowerCase());
+      iconEl.innerHTML = '<img src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=' + seed + '&size=48&backgroundColor=transparent" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">';
+      iconEl.style.background = 'transparent';
+    } else if (val.length >= 6 && val.startsWith('0x')) {
+      iconEl.innerHTML = '';
+      iconEl.style.background = addressToGradient(val);
+    } else {
+      iconEl.innerHTML = '';
+      iconEl.style.background = 'rgba(255,255,255,0.05)';
+    }
+  }
+
+  // ── Input handlers ──
+  walletA.addEventListener('input', function() {
+    validateInput(walletA);
+    updateBattleBtn();
+    updateIcon(iconA, walletA.value);
+  });
+
+  walletB.addEventListener('input', function() {
+    validateInput(walletB);
+    updateBattleBtn();
+    updateIcon(iconB, walletB.value);
+  });
+
+  // ── Battle submission ──
+  async function submitBattle(withPayment) {
+    var addrA = walletA.value.trim();
+    var addrB = walletB.value.trim();
+    var chain = chainSel.value;
+
+    if (!isValidAddress(addrA) || !isValidAddress(addrB)) return;
+
+    setLoading(true);
+    hideError();
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (withPayment && paymentProof) {
+      headers['X-Payment'] = paymentProof;
+    }
+
+    try {
+      var resp = await fetch('/api/battle', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ wallet_a: addrA, wallet_b: addrB, chain: chain })
+      });
+
+      var data = await resp.json();
+
+      // 402 = Payment Required (rate limit exceeded, pay to continue)
+      if (resp.status === 402) {
+        pendingPaymentInfo = data.payment || null;
+        if (pendingPaymentInfo) {
+          paywallWait.textContent = data.message || 'Come back tomorrow for another free battle';
+        }
+        showPaywall();
+        return;
+      }
+
+      if (!resp.ok) {
+        throw new Error(data.error || data.message || ('Battle failed (HTTP ' + resp.status + ')'));
+      }
+
+      var battleId = data.id || data.battle_id || data.battleId;
+      if (battleId) {
+        window.location.href = '/battle/' + battleId;
+      } else {
+        throw new Error('No battle ID returned from server');
+      }
+
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  battleForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBattle(!!paymentProof);
+  });
+
+  function setLoading(on) {
+    battleBtn.classList.toggle('loading', on);
+    battleBtn.disabled = on || !(isValidAddress(walletA.value.trim()) && isValidAddress(walletB.value.trim()));
+  }
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add('visible');
+  }
+
+  function hideError() {
+    errorMsg.textContent = '';
+    errorMsg.classList.remove('visible');
+  }
+
+  // ══════════════════════════════════════
+  //  PAYWALL + WALLET CONNECT + USDC PAY
+  // ══════════════════════════════════════
+
+  function showPaywall() {
+    paywallOverlay.classList.add('visible');
+    payStatus.textContent = '';
+    payBtn.classList.remove('loading');
+    payBtn.disabled = false;
+
+    // Check if MetaMask / Web3 wallet is available
+    if (!window.ethereum) {
+      noWalletHint.style.display = 'block';
+      payBtn.disabled = true;
+    } else {
+      noWalletHint.style.display = 'none';
+    }
+  }
+
+  function hidePaywall() {
+    paywallOverlay.classList.remove('visible');
+  }
+
+  paywallClose.addEventListener('click', hidePaywall);
+  paywallOverlay.addEventListener('click', function(e) {
+    if (e.target === paywallOverlay) hidePaywall();
+  });
+
+  // ── Pay with MetaMask ──
+  payBtn.addEventListener('click', async function() {
+    if (!window.ethereum) {
+      noWalletHint.style.display = 'block';
+      return;
+    }
+
+    var recipient = pendingPaymentInfo?.recipient;
+    if (!recipient || recipient === '0x0000000000000000000000000000000000000000') {
+      payStatus.textContent = 'Payment not configured on server. Contact admin.';
+      payStatus.style.color = '#ff6666';
+      return;
+    }
+
+    payBtn.classList.add('loading');
+    payBtn.disabled = true;
+    payStatus.textContent = 'Connecting wallet...';
+    payStatus.style.color = 'rgba(200,200,220,0.5)';
+
+    try {
+      // 1. Request account access
+      var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      var sender = accounts[0];
+      payStatus.textContent = 'Connected: ' + sender.slice(0, 6) + '...' + sender.slice(-4);
+
+      // 2. Switch to Base network if needed
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BASE_CHAIN_ID }]
+        });
+      } catch (switchErr) {
+        // Chain not added, try to add Base
+        if (switchErr.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_CHAIN_ID,
+              chainName: 'Base',
+              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.base.org'],
+              blockExplorerUrls: ['https://basescan.org']
+            }]
+          });
+        } else {
+          throw switchErr;
+        }
+      }
+      payStatus.textContent = 'Switched to Base network...';
+
+      // 3. Build ERC20 transfer calldata
+      // transfer(address to, uint256 amount)
+      var recipientPadded = recipient.slice(2).toLowerCase().padStart(64, '0');
+      var amountHex = parseInt(BATTLE_PRICE_WEI).toString(16).padStart(64, '0');
+      var calldata = ERC20_TRANSFER_ABI + recipientPadded + amountHex;
+
+      payStatus.textContent = 'Confirm USDC transfer in your wallet...';
+
+      // 4. Send ERC20 transfer transaction
+      var txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: sender,
+          to: USDC_CONTRACT,
+          data: calldata,
+          value: '0x0'
+        }]
+      });
+
+      payStatus.textContent = 'Payment sent! Tx: ' + txHash.slice(0, 10) + '...';
+      payStatus.style.color = '#44ff88';
+
+      // 5. Build x402 payment proof header
+      paymentProof = 'USDC:' + recipient + ':' + BATTLE_PRICE_WEI + ':' + txHash;
+
+      // 6. Wait a moment, then auto-retry the battle
+      payStatus.textContent = 'Payment confirmed! Starting battle...';
+      setTimeout(function() {
+        hidePaywall();
+        submitBattle(true);
+      }, 1500);
+
+    } catch (err) {
+      payBtn.classList.remove('loading');
+      payBtn.disabled = false;
+
+      if (err.code === 4001) {
+        payStatus.textContent = 'Transaction rejected by user.';
+        payStatus.style.color = '#ff6666';
+      } else {
+        payStatus.textContent = 'Error: ' + (err.message || 'Transaction failed').slice(0, 80);
+        payStatus.style.color = '#ff6666';
+      }
+    }
+  });
+
+  // ══════════════════════════════
+  //  RECENT BATTLES
+  // ══════════════════════════════
+
+  async function loadRecentBattles() {
+    try {
+      var resp = await fetch('/api/battle/recent/list');
+      if (!resp.ok) return;
+      var data = await resp.json();
+      var battles = data.battles || data.data || data;
+
+      if (!Array.isArray(battles) || battles.length === 0) return;
+
+      emptyState.style.display = 'none';
+
+      var fragment = document.createDocumentFragment();
+      var shown = battles.slice(0, 5);
+
+      shown.forEach(function(b) {
+        var a = document.createElement('a');
+        var bid = b.id || b.battle_id || b.battleId;
+        a.href = '/battle/' + bid;
+        a.className = 'recent-card';
+
+        var addrA = b.wallet_a || b.walletA || b.challenger_a || '';
+        var addrB = b.wallet_b || b.walletB || b.challenger_b || '';
+        var winner = b.winner || b.result || '';
+
+        var badgeClass = 'draw';
+        var badgeText  = 'DRAW';
+        if (winner && winner.toLowerCase() === addrA.toLowerCase()) {
+          badgeClass = 'winner-a'; badgeText = 'A WINS';
+        } else if (winner && winner.toLowerCase() === addrB.toLowerCase()) {
+          badgeClass = 'winner-b'; badgeText = 'B WINS';
+        } else if (winner === 'a' || winner === 'A') {
+          badgeClass = 'winner-a'; badgeText = 'A WINS';
+        } else if (winner === 'b' || winner === 'B') {
+          badgeClass = 'winner-b'; badgeText = 'B WINS';
+        }
+
+        var seedA = encodeURIComponent(addrA.toLowerCase());
+
+        a.innerHTML =
+          '<span class="recent-dot" style="background:transparent;overflow:hidden"><img src="https://api.dicebear.com/9.x/bottts-neutral/svg?seed=' + seedA + '&size=24&backgroundColor=transparent" style="width:100%;height:100%;border-radius:50%"></span>' +
+          '<span class="recent-addresses">' +
+            '<span class="recent-addr addr-a" title="' + addrA + '">' + truncAddr(addrA) + '</span>' +
+            '<span class="recent-vs">VS</span>' +
+            '<span class="recent-addr addr-b" title="' + addrB + '">' + truncAddr(addrB) + '</span>' +
+          '</span>' +
+          '<span class="winner-badge ' + badgeClass + '">' + badgeText + '</span>' +
+          '<span class="recent-arrow">&#x203A;</span>';
+
+        fragment.appendChild(a);
+      });
+
+      recentList.appendChild(fragment);
+
+    } catch (err) {
+      // Silently fail
+    }
+  }
+
+  function truncAddr(addr) {
+    if (!addr || addr.length < 10) return addr || '???';
+    return addr.slice(0, 6) + '\u2026' + addr.slice(-4);
+  }
+
+  loadRecentBattles();
+
+})();
+</script>
+
+</body>
+</html>
