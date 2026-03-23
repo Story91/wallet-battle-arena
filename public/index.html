@@ -552,12 +552,11 @@
     border-radius: 12px;
     padding: 20px 16px;
     text-align: center;
-    position: relative;
   }
 
-  .price-card.premium {
-    border-color: rgba(255,215,0,0.2);
-    background: linear-gradient(170deg, rgba(20,15,5,0.9), var(--bg-card));
+  .price-card.agents {
+    border-color: rgba(68,255,255,0.15);
+    background: linear-gradient(170deg, rgba(5,15,20,0.9), var(--bg-card));
   }
 
   .price-label {
@@ -570,7 +569,7 @@
   }
 
   .price-card:first-child .price-label { color: var(--neon); }
-  .price-card.premium .price-label { color: var(--gold); }
+  .price-card.agents .price-label { color: #44ffff; }
 
   .price-amount {
     font-family: 'JetBrains Mono', monospace;
@@ -580,7 +579,7 @@
   }
 
   .price-card:first-child .price-amount { color: var(--neon); }
-  .price-card.premium .price-amount { color: var(--gold); }
+  .price-card.agents .price-amount { color: #44ffff; }
 
   .price-unit {
     font-size: 0.75rem;
@@ -596,25 +595,19 @@
 
   .price-detail strong { color: var(--text-dim); }
 
-  .payment-methods {
-    margin-top: 14px;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .method-tag {
+  .price-badge {
+    display: inline-block;
+    margin-top: 12px;
     padding: 3px 10px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.6rem;
     font-weight: 600;
     letter-spacing: 1px;
     border-radius: 4px;
+    color: #44ffff;
+    background: rgba(68,255,255,0.06);
+    border: 1px solid rgba(68,255,255,0.12);
   }
-
-  .method-tag.wallet { color: var(--gold); background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.12); }
-  .method-tag.x402 { color: #44ffff; background: rgba(68,255,255,0.06); border: 1px solid rgba(68,255,255,0.12); }
 
   /* ══ MCP / AGENTS ══ */
   .agents-section {
@@ -785,42 +778,6 @@
   .paywall-currency { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; }
   .paywall-chain { font-size: 0.68rem; color: rgba(68,136,255,0.5); letter-spacing: 1px; display: block; margin-top: -12px; margin-bottom: 18px; }
 
-  .pay-btn {
-    width: 100%;
-    padding: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--bg);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: linear-gradient(135deg, var(--gold), #ffaa00);
-    transition: all 0.3s;
-  }
-
-  .pay-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 25px rgba(255,200,0,0.25); }
-  .pay-btn:disabled { background: rgba(255,215,0,0.1); color: rgba(255,215,0,0.2); cursor: not-allowed; }
-  .pay-btn .pay-spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(0,0,0,0.15); border-top-color: var(--bg); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
-  .pay-btn.loading .pay-text { display: none; }
-  .pay-btn.loading .pay-spinner { display: block; }
-
-  .paywall-status { margin-top: 12px; font-size: 0.78rem; color: var(--text-dim); min-height: 1.2em; }
-
-  .no-wallet-hint {
-    margin-top: 14px;
-    padding: 10px 12px;
-    background: rgba(255,100,50,0.04);
-    border: 1px solid rgba(255,100,50,0.1);
-    border-radius: 8px;
-    font-size: 0.75rem;
-    color: rgba(255,150,100,0.5);
-    display: none;
-  }
-  .no-wallet-hint a { color: var(--gold); }
-
   .paywall-or { font-size: 0.7rem; color: var(--text-muted); margin-top: 14px; letter-spacing: 2px; }
   .paywall-wait { font-size: 0.75rem; color: var(--text-dim); margin-top: 6px; }
 
@@ -923,7 +880,7 @@
     </button>
 
     <div class="tier-info">
-      <span class="free">1 free battle/day</span> &middot; <span class="paid">0.50 USDC = 5 more</span> via MetaMask or x402
+      <span class="free">1 free battle/day</span> &middot; <span class="paid">0.50 USDC = 5 more</span> via x402
     </div>
   </form>
 
@@ -976,17 +933,14 @@
         <div class="price-label">Free Tier</div>
         <div class="price-amount">$0</div>
         <div class="price-unit">per day</div>
-        <div class="price-detail"><strong>1 battle</strong> per day<br>Full stats + OG image</div>
+        <div class="price-detail"><strong>1 battle free daily</strong><br>Full stats + OG image</div>
       </div>
-      <div class="price-card premium">
+      <div class="price-card agents">
         <div class="price-label">Battle Pack</div>
         <div class="price-amount">$0.50</div>
         <div class="price-unit">USDC on Base</div>
-        <div class="price-detail"><strong>5 battles</strong> per pack<br>Pay via wallet or x402 header</div>
-        <div class="payment-methods">
-          <span class="method-tag wallet">MetaMask</span>
-          <span class="method-tag x402">x402 Protocol</span>
-        </div>
+        <div class="price-detail"><strong>5 battles</strong> per pack<br>Pay via x402 header</div>
+        <span class="price-badge">x402 Protocol</span>
       </div>
     </div>
   </section>
@@ -1031,25 +985,24 @@
     </div>
   </section>
 
-  <!-- Paywall Modal -->
+
+  <!-- Rate Limit Modal -->
   <div class="paywall-overlay" id="paywallOverlay">
     <div class="paywall-card">
       <button class="paywall-close" id="paywallClose">&times;</button>
       <div class="paywall-icon">&#x26A1;</div>
       <div class="paywall-title">BATTLE PACK</div>
-      <p class="paywall-desc">You've used your free battle today.<br>Pay 0.50 USDC to get 5 more battles.</p>
+      <p class="paywall-desc">You've used your free battle today.<br>Get 5 more battles for 0.50 USDC via x402.</p>
       <div class="paywall-price">
         <span class="paywall-amount">0.50</span>
         <span class="paywall-currency">USDC</span>
       </div>
-      <span class="paywall-chain">on Base network</span>
-      <button class="pay-btn" id="payBtn">
-        <span class="pay-text">Connect Wallet &amp; Pay</span>
-        <div class="pay-spinner"></div>
-      </button>
-      <div class="paywall-status" id="payStatus"></div>
-      <div class="no-wallet-hint" id="noWalletHint">
-        No wallet detected. Install <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> or use the <strong>x402 API header</strong> instead.
+      <span class="paywall-chain">on Base &middot; x402 protocol</span>
+      <div class="code-block" style="text-align:left;margin-top:16px;font-size:0.68rem">
+        <span class="comment">// Add this header to your API call</span><br>
+        <span class="key">X-Payment</span>: <span class="str">USDC:&lt;recipient&gt;:500000</span><br><br>
+        <span class="comment">// POST /api/battle</span><br>
+        { <span class="key">"wallet_a"</span>: <span class="str">"0x..."</span>, <span class="key">"wallet_b"</span>: <span class="str">"0x..."</span> }
       </div>
       <div class="paywall-or">// OR //</div>
       <div class="paywall-wait" id="paywallWait">Come back tomorrow for another free battle</div>
@@ -1069,14 +1022,6 @@
 (function() {
   'use strict';
 
-  var USDC_CONTRACT = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-  var BATTLE_PRICE_WEI = '500000';
-  var BASE_CHAIN_ID = '0x2105';
-  var ERC20_TRANSFER_ABI = '0xa9059cbb';
-
-  var paymentProof = null;
-  var pendingPaymentInfo = null;
-
   var walletA    = document.getElementById('walletA');
   var walletB    = document.getElementById('walletB');
   var iconA      = document.getElementById('iconA').querySelector('.icon-inner');
@@ -1089,9 +1034,6 @@
   var emptyState = document.getElementById('emptyState');
   var paywallOverlay = document.getElementById('paywallOverlay');
   var paywallClose   = document.getElementById('paywallClose');
-  var payBtn         = document.getElementById('payBtn');
-  var payStatus      = document.getElementById('payStatus');
-  var noWalletHint   = document.getElementById('noWalletHint');
   var paywallWait    = document.getElementById('paywallWait');
 
   var ADDR_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -1121,19 +1063,16 @@
   walletA.addEventListener('input', function() { validateInput(walletA); updateBtn(); updateIcon(iconA, walletA.value); });
   walletB.addEventListener('input', function() { validateInput(walletB); updateBtn(); updateIcon(iconB, walletB.value); });
 
-  async function submitBattle(withPay) {
+  async function submitBattle() {
     var a = walletA.value.trim(), b = walletB.value.trim(), ch = chainSel.value;
     if (!isValid(a) || !isValid(b)) return;
     setLoading(true); hideError();
 
-    var hdrs = { 'Content-Type': 'application/json' };
-    if (withPay && paymentProof) hdrs['X-Payment'] = paymentProof;
-
     try {
-      var resp = await fetch('/api/battle', { method: 'POST', headers: hdrs, body: JSON.stringify({ wallet_a: a, wallet_b: b, chain: ch }) });
+      var resp = await fetch('/api/battle', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ wallet_a: a, wallet_b: b, chain: ch }) });
       var data = await resp.json();
 
-      if (resp.status === 402) { pendingPaymentInfo = data.payment || null; if (pendingPaymentInfo) paywallWait.textContent = data.message; showPaywall(); return; }
+      if (resp.status === 402) { if (data.message) paywallWait.textContent = data.message; showPaywall(); return; }
       if (!resp.ok) throw new Error(data.error || data.message || 'Battle failed');
 
       var bid = data.id || data.battle_id || data.battleId;
@@ -1142,48 +1081,17 @@
     } catch (err) { showError(err.message); } finally { setLoading(false); }
   }
 
-  battleForm.addEventListener('submit', function(e) { e.preventDefault(); submitBattle(!!paymentProof); });
+  battleForm.addEventListener('submit', function(e) { e.preventDefault(); submitBattle(); });
 
   function setLoading(on) { battleBtn.classList.toggle('loading', on); battleBtn.disabled = on || !(isValid(walletA.value.trim()) && isValid(walletB.value.trim())); }
   function showError(m) { errorMsg.textContent = m; errorMsg.classList.add('visible'); }
   function hideError() { errorMsg.textContent = ''; errorMsg.classList.remove('visible'); }
 
-  // ── Paywall ──
-  function showPaywall() { paywallOverlay.classList.add('visible'); payStatus.textContent = ''; payBtn.classList.remove('loading'); payBtn.disabled = !window.ethereum; noWalletHint.style.display = window.ethereum ? 'none' : 'block'; }
+  // ── Rate limit modal ──
+  function showPaywall() { paywallOverlay.classList.add('visible'); }
   function hidePaywall() { paywallOverlay.classList.remove('visible'); }
   paywallClose.addEventListener('click', hidePaywall);
   paywallOverlay.addEventListener('click', function(e) { if (e.target === paywallOverlay) hidePaywall(); });
-
-  payBtn.addEventListener('click', async function() {
-    if (!window.ethereum) { noWalletHint.style.display = 'block'; return; }
-    var recipient = pendingPaymentInfo?.recipient;
-    if (!recipient || recipient === '0x0000000000000000000000000000000000000000') { payStatus.textContent = 'Payment not configured. Contact admin.'; payStatus.style.color = '#ff6666'; return; }
-
-    payBtn.classList.add('loading'); payBtn.disabled = true;
-    payStatus.textContent = 'Connecting wallet...'; payStatus.style.color = 'var(--text-dim)';
-
-    try {
-      var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      var sender = accounts[0];
-      payStatus.textContent = 'Connected: ' + sender.slice(0, 6) + '...' + sender.slice(-4);
-
-      try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] }); }
-      catch (sw) { if (sw.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: BASE_CHAIN_ID, chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] }); else throw sw; }
-
-      payStatus.textContent = 'Confirm USDC transfer in your wallet...';
-      var rp = recipient.slice(2).toLowerCase().padStart(64, '0');
-      var am = parseInt(BATTLE_PRICE_WEI).toString(16).padStart(64, '0');
-      var txHash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: sender, to: USDC_CONTRACT, data: ERC20_TRANSFER_ABI + rp + am, value: '0x0' }] });
-
-      payStatus.textContent = 'Payment sent! Starting battle...'; payStatus.style.color = '#00e676';
-      paymentProof = 'USDC:' + recipient + ':' + BATTLE_PRICE_WEI + ':' + txHash;
-      setTimeout(function() { hidePaywall(); submitBattle(true); }, 1500);
-    } catch (err) {
-      payBtn.classList.remove('loading'); payBtn.disabled = false;
-      payStatus.textContent = err.code === 4001 ? 'Transaction rejected.' : 'Error: ' + (err.message || '').slice(0, 80);
-      payStatus.style.color = '#ff6666';
-    }
-  });
 
   // ── Recent Battles ──
   async function loadRecent() {
